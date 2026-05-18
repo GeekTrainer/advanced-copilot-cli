@@ -6,13 +6,13 @@ This document describes a potential plan for landing the **advanced-copilot-cli*
 
 Land the course at `/learning-hub/advanced-copilot-cli/` on the Learning Hub site as **three tracks** the learner picks once and stays in:
 
-- **java** — existing AssetTrack content (Java/jQuery legacy app) — this repo's nine modules
-- **dotnet** — .NET legacy modernization scenario (stub initially; content TBD)
+- **multi-stack** — the canonical AssetTrack content (Java + Astro/TypeScript + .NET + FastAPI) — this repo's nine modules
+- **dotnet** — .NET-focused legacy modernization scenario (stub initially; content TBD)
 - **nextjs** — Next.js greenfield scenario (stub initially; content TBD)
 
 URL shape per lesson: `/learning-hub/advanced-copilot-cli/{track}/NN-slug/`.
 
-**Next.js skip-list**: skip `02-building-ai-infrastructure` and `06-modernization-strategies`; keep `00, 01, 03, 04, 05, 07, 08`. The Next.js track overview will note the intentional omission.
+**Next.js skip-list**: greenfield Next.js doesn't fit the brownfield-modernization framing of `06-modernize-apps`, and the custom-MCP-for-the-legacy-database exercise in `07-manage-infrastructure` is also out of scope. Skip `06-modernize-apps` and `07-manage-infrastructure`; keep `00, 01, 02, 03, 04, 05, 08`. The Next.js track overview will note the intentional omission.
 
 ## Approach
 
@@ -55,18 +55,18 @@ Pure-Node (uses only built-ins so it runs from the awesome-copilot repo root wit
      - `> [!NOTE]` → `:::note`
      - `> [!IMPORTANT]` / `[!TIP]` → `:::tip`
      - `> [!WARNING]` / `[!CAUTION]` → `:::caution`
-     - Also handle the malformed `> ![NOTE]` variants currently in the source.
+     - Defensively handle the malformed `> ![NOTE]` variant (bang outside brackets) in case it reappears; canonical form is `> [!NOTE]`.
      - Consume the full blockquote body and emit a closing `:::`.
    - Rewrite **all** local Markdown links to track-internal slugs:
-     - reference-style defs: `[next-lesson]: ./01-foo.md` → `[next-lesson]: /learning-hub/advanced-copilot-cli/java/01-foo/`
-     - inline links: `[text](./01-foo.md#anchor)` → `[text](/learning-hub/advanced-copilot-cli/java/01-foo/#anchor)`
+     - reference-style defs: `[next-lesson]: ./01-foo.md` → `[next-lesson]: /learning-hub/advanced-copilot-cli/multi-stack/01-foo/`
+     - inline links: `[text](./01-foo.md#anchor)` → `[text](/learning-hub/advanced-copilot-cli/multi-stack/01-foo/#anchor)`
      - Both `./` and bare `01-foo.md` forms supported.
      - External links (`http`, `https`, `mailto:`, in-page `#`) preserved unchanged.
    - Compute `prev`/`next` from a manifest of the nine ordered slugs:
      - First lesson: `prev: false`.
      - Last lesson: `next: false`.
      - All others: `prev`/`next` to neighboring slugs with their titles as labels.
-3. **Write** to `website/src/content/docs/learning-hub/advanced-copilot-cli/java/` in awesome-copilot. Idempotent.
+3. **Write** to `website/src/content/docs/learning-hub/advanced-copilot-cli/multi-stack/` in awesome-copilot. Idempotent.
 4. **Fail loudly** if a local link target doesn't exist in the source set, an unrecognized `> [!XXX]` admonition appears, or a local image link is encountered (image asset handling is out of scope for the first iteration).
 5. Do **not** touch `dotnet/` or `nextjs/` folders.
 
@@ -98,9 +98,9 @@ A new top-level group is inserted between "CLI for Beginners" and "Cookbook":
   items: [
     { label: "Overview", link: "/learning-hub/advanced-copilot-cli/" },
     {
-      label: "Java / jQuery (AssetTrack)",
+      label: "Multi-stack (AssetTrack)",
       collapsed: true,
-      autogenerate: { directory: "learning-hub/advanced-copilot-cli/java" },
+      autogenerate: { directory: "learning-hub/advanced-copilot-cli/multi-stack" },
     },
     {
       label: ".NET legacy",
@@ -116,7 +116,7 @@ A new top-level group is inserted between "CLI for Beginners" and "Cookbook":
 },
 ```
 
-Pagination is governed by the explicit `prev`/`next` frontmatter on each Java lesson, so a learner finishing Java doesn't get chained into the .NET stubs.
+Pagination is governed by the explicit `prev`/`next` frontmatter on each multi-stack lesson, so a learner finishing the multi-stack track doesn't get chained into the .NET stubs.
 
 ### `learning-hub-updater.md` workflow
 
@@ -124,45 +124,48 @@ That workflow already excludes `cli-for-beginners` from automated edits. Its exc
 
 ## Module → track applicability
 
-| Module                              | java | dotnet | nextjs |
-| ----------------------------------- | :--: | :----: | :----: |
-| 00-prerequisites                    |  ✅  |   ✅   |   ✅   |
-| 01-working-with-copilot-cli         |  ✅  |   ✅   |   ✅   |
-| 02-building-ai-infrastructure       |  ✅  |   ✅   |   ❌   |
-| 03-planning-and-accessibility       |  ✅  |   ✅   |   ✅   |
-| 04-enhancing-test-suite             |  ✅  |   ✅   |   ✅   |
-| 05-agents-follow-standards          |  ✅  |   ✅   |   ✅   |
-| 06-modernization-strategies         |  ✅  |   ✅   |   ❌   |
-| 07-bringing-it-all-together         |  ✅  |   ✅   |   ✅   |
-| 08-wrap-up                          |  ✅  |   ✅   |   ✅   |
+| Module                              | multi-stack | dotnet | nextjs |
+| ----------------------------------- | :---------: | :----: | :----: |
+| 00-prerequisites                    |     ✅      |   ✅   |   ✅   |
+| 01-working-with-copilot-cli         |     ✅      |   ✅   |   ✅   |
+| 02-building-ai-infrastructure       |     ✅      |   ✅   |   ✅   |
+| 03-test-suite-remote-delegation     |     ✅      |   ✅   |   ✅   |
+| 04-lifecycle-hooks                  |     ✅      |   ✅   |   ✅   |
+| 05-add-feature-barcode              |     ✅      |   ✅   |   ✅   |
+| 06-modernize-apps                   |     ✅      |   ✅   |   ❌   |
+| 07-manage-infrastructure            |     ✅      |   ✅   |   ❌   |
+| 08-wrap-up                          |     ✅      |   ✅   |   ✅   |
+
+> [!NOTE]
+> The course's canonical scenario is now **AssetTrack** (Java + Astro/TypeScript + .NET + FastAPI), so the previous "java" track has been renamed to `multi-stack`. The upstream `legacy-app` repo may need a counterpart that matches this multi-stack shape — flagged separately from this publishing plan.
 
 ## Target folder layout (downstream, in awesome-copilot)
 
 ```
 website/src/content/docs/learning-hub/advanced-copilot-cli/
   index.mdx                              ← track picker (CardGrid + 3 LinkCards)
-  java/
+  multi-stack/
     index.md                             ← track overview, sidebar.order: 0
     00-prerequisites.md                  ← all sync-generated, with explicit prev/next
     01-working-with-copilot-cli.md
     02-building-ai-infrastructure.md
-    03-planning-and-accessibility.md
-    04-enhancing-test-suite.md
-    05-agents-follow-standards.md
-    06-modernization-strategies.md
-    07-bringing-it-all-together.md
+    03-test-suite-remote-delegation.md
+    04-lifecycle-hooks.md
+    05-add-feature-barcode.md
+    06-modernize-apps.md
+    07-manage-infrastructure.md
     08-wrap-up.md
   dotnet/                                ← stubs
     index.md
-    00-prerequisites.md … 08-wrap-up.md  (9 stubs)
+    00-prerequisites.md … 08-wrap-up.md  (9 stubs, matching multi-stack slugs)
   nextjs/                                ← stubs, skip-list applied
     index.md
     00-prerequisites.md
     01-working-with-copilot-cli.md
-    03-planning-and-accessibility.md
-    04-enhancing-test-suite.md
-    05-agents-follow-standards.md
-    07-bringing-it-all-together.md
+    02-building-ai-infrastructure.md
+    03-test-suite-remote-delegation.md
+    04-lifecycle-hooks.md
+    05-add-feature-barcode.md
     08-wrap-up.md
 ```
 
@@ -170,12 +173,12 @@ website/src/content/docs/learning-hub/advanced-copilot-cli/
 
 1. Create the `advanced-copilot-cli/` skeleton + track-picker `index.mdx`.
 2. Author `scripts/sync-advanced-copilot-cli.mjs` per the spec above.
-3. Run the sync script to mirror the Java track from this repo.
-4. Stub the `dotnet/` track (nine lesson stubs + index).
-5. Stub the `nextjs/` track (seven lesson stubs + index, skipping 02 and 06).
+3. Run the sync script to mirror the multi-stack track from this repo.
+4. Stub the `dotnet/` track (nine lesson stubs + index, matching the multi-stack slugs).
+5. Stub the `nextjs/` track (seven lesson stubs + index, skipping 06 and 07).
 6. Update `website/astro.config.mjs` with the new sidebar group.
 7. Extend `.github/workflows/learning-hub-updater.md` to exclude `advanced-copilot-cli`.
-8. Run `npm run build` in `website/` and verify: no broken-link errors, all three tracks render, Java track's prev/next chain is bounded within the track.
+8. Run `npm run build` in `website/` and verify: no broken-link errors, all three tracks render, multi-stack track's prev/next chain is bounded within the track.
 
 ## Authoring guidance for this repo
 
@@ -183,7 +186,7 @@ To keep sync friction low, follow these conventions in `content/*.md`:
 
 - **Single H1** at the top of each lesson; the script uses it as the page title.
 - **Lead paragraph** immediately after the H1 — used as the page description.
-- **GitHub-style admonitions** (`> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!CAUTION]`, `> [!IMPORTANT]`) are auto-converted to Starlight Asides. Avoid the `> ![NOTE]` (with `!` inside `[]`) variant; the script handles it but it's fragile.
+- **GitHub-style admonitions** (`> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!CAUTION]`, `> [!IMPORTANT]`) are auto-converted to Starlight Asides. Always use this canonical form — bang inside the brackets, marker on its own `>` line.
 - **Internal links** to other lessons use relative paths (`./01-foo.md` or `[next-lesson]: ./01-foo.md`); they're auto-rewritten to track-internal Starlight slugs.
 - **No local images yet.** The sync script fails on local image references; add image handling before introducing them.
 - **Lesson order** is set by the numeric filename prefix (`00-…` … `08-…`).
