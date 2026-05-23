@@ -161,10 +161,10 @@ In this exercise, you'll add a reusable `Accessibility Expert` custom agent and 
 
 5. Create a new file - `.github/agents/accessibility-expert.agent.md` - and paste the copied content into it.
 
-    > [!NOTE]
-    > Tools and toolsets are updated frequently, so you might notice some of the tools mentioned in the agent definition file are no longer available or have changed names. If that's the case,  click on **Configure Tools ...** right above the `tools: ...` definition in the agent file, and select the **Built-in** and **GitHub MCP** checkboxes. This will update the agent definition with the current tool names and you can always adjust the allowlist accordingly. 
-    >
-    > Ensure you enable the GitHub tools for a later exercise in this module.
+> [!NOTE]
+> Tools and toolsets are updated frequently, so you might notice some of the tools mentioned in the agent definition file are no longer available or have changed names. If that's the case,  click on **Configure Tools ...** right above the `tools: ...` definition in the agent file, and select the **Built-in** and **GitHub MCP** checkboxes. This will update the agent definition with the current tool names and you can always adjust the allowlist accordingly.
+>
+> Ensure you enable the GitHub tools for a later exercise in this module.
 
 6. If you exited the previous Copilot CLI session, restart it or reset to a clean conversation with `/new`.
 
@@ -226,8 +226,8 @@ Let's bring it all together now. You'll use the `make-repo-contribution` skill t
 
     Observe as the agent works on the implementation and automatically invokes the `make-repo-contribution` skill when ready to land the change. The agent should first create an issue using the provided template, then commit the change, push to a new branch and open a PR linking the issue, all through the skill's workflow.
 
-    > [!NOTE]
-    > Compare what just happened to the manual push and PR you opened at the end of Exercise 2. The skill enforced the same steps with issue, branch, commit, PR, linked issue - but as a single, consistent unit. For Contoso, that means every AI-driven contribution follows the same auditable flow regardless of who (or what) triggered it.
+> [!NOTE]
+> Compare what just happened to the manual push and PR you opened at the end of Exercise 2. The skill enforced the same steps with issue, branch, commit, PR, linked issue - but as a single, consistent unit. For Contoso, that means every AI-driven contribution follows the same auditable flow regardless of who (or what) triggered it.
 
 3. Navigate to your repository on GitHub.com, open each PR, review the changes and merge both into `main`.
 
