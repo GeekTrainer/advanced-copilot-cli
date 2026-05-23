@@ -19,7 +19,7 @@ By the end of this section you will be able to:
 Contoso has a set of best practices that need to be followed in every code change: stack-specific conventions, accessibility requirements (the organization is moving toward WCAG 2.2 AA), and a hard rule that every AI-generated change must flow through an issue and a pull request - no direct commits to main.
 
 > [!NOTE]
-> **Starting state**: your fork has the documentation updates from [Section 1][previous-lesson] merged.
+> Starting state: your fork has the documentation updates from [Section 1][previous-lesson] merged.
 
 ## Add custom instructions to Copilot CLI
 
@@ -38,8 +38,7 @@ Copilot CLI loads instructions from several sources and combines them. The sourc
 
 This layering is intentional as they all serve different purposes, but can also result in conflicting rules if not managed carefully. Copilot combines instructions when all sources are present but given the non-deterministic nature of language models, its choice of instruction mix might not always be predictable.
 
-> [!TIP]
-> Knowing where the agent looks for instructions is the first debugging step when you notice Copilot ignoring rules. Run `/instructions` to see exactly what's loaded in the current session and update your files accordingly.
+Knowing where the agent looks for instructions is the first debugging step when you notice Copilot ignoring rules. Run `/instructions` to see exactly what's loaded in the current session and update your files accordingly.
 
 ### Agent-generated baseline instructions
 
@@ -85,7 +84,7 @@ Let's start with our Java parts of the codebase.
 
 1. Create a new file - `.github/instructions/java.instructions.md`, and paste in the following content:
 
-    ```
+    ```markdown
     ---
     applyTo: "services/**/*.java"
     description: This file describes instructions for Java code style and best practices for the project.
@@ -104,7 +103,7 @@ Let's start with our Java parts of the codebase.
 
 2. Spot-check the scoped instructions with a stack-specific prompt:
 
-    ```
+    ```text
     Refactor the notification logic in AssignmentService into a separate component that properly handles failures instead of swallowing exceptions. Show me the new interface, implementation class and how you'd update AssignmentService to use it - don't apply it
     ```
 
@@ -114,7 +113,7 @@ Let's start with our Java parts of the codebase.
 
 3. In the Copilot CLI, run `/new` to reset the session context, then prompt Copilot to create the Astro instructions file:
 
-    ```
+    ```text
     Generate a path-specific instruction file for only the Astro + TypeScript React frontend portions of this mixed-language microservices application. Use proper `.instructions.md` format with YAML frontmatter - `applyTo` single glob expression targeting frontend Astro/TS/TSX files only, and accurate description and should be optimized for high quality future code updates. Define concise engineering standards for Astro + React architecture, strict TypeScript, accessibility, styling consistency, performant data fetching, error/loading states, testing, maintainability, minimal dependencies, clean incremental changes etc.
 
     ```
@@ -131,7 +130,7 @@ Let's start with our Java parts of the codebase.
 
 6. Create a new branch and commit the instruction files. Don't push yet:
 
-    ```
+    ```text
     Create a new branch called add-ai-infrastructure and commit the instruction files with a descriptive commit message.
     ```
 
@@ -152,7 +151,7 @@ Custom agents live in `.github/agents/` (for repo-scoped) or `~/.copilot/agents/
 
 In this exercise, you'll add a reusable `Accessibility Expert` custom agent and use it against the frontend code. Instead of designing the agent from scratch, you'll reuse one from the Awesome GitHub Copilot repo, a community-curated collection of copilot customizations that are ready to drop in. 
 
-1. Browse the [Awesome GitHub Copilot](https://awesome-copilot.github.com/) website and in the search bar, type "accessibility" to find related customizations.
+1. Browse the [Awesome GitHub Copilot][awesome-copilot] website and in the search bar, type "accessibility" to find related customizations.
 
 2. Select the **Agent** filter, and find the `Accessibility Expert - Agent`. Click on it.
 
@@ -162,10 +161,10 @@ In this exercise, you'll add a reusable `Accessibility Expert` custom agent and 
 
 5. Create a new file - `.github/agents/accessibility-expert.agent.md` - and paste the copied content into it.
 
-    > [!NOTE]
-    > Tools and toolsets are updated frequently, so you might notice some of the tools mentioned in the agent definition file are no longer available or have changed names. If that's the case,  click on **Configure Tools ...** right above the `tools: ...` definition in the agent file, and select the **Built-in** and **GitHub MCP** checkboxes. This will update the agent definition with the current tool names and you can always adjust the allowlist accordingly. 
-    >
-    > Ensure you enable the GitHub tools for a later exercise in this module.
+> [!NOTE]
+> Tools and toolsets are updated frequently, so you might notice some of the tools mentioned in the agent definition file are no longer available or have changed names. If that's the case,  click on **Configure Tools ...** right above the `tools: ...` definition in the agent file, and select the **Built-in** and **GitHub MCP** checkboxes. This will update the agent definition with the current tool names and you can always adjust the allowlist accordingly.
+>
+> Ensure you enable the GitHub tools for a later exercise in this module.
 
 6. If you exited the previous Copilot CLI session, restart it or reset to a clean conversation with `/new`.
 
@@ -175,14 +174,13 @@ In this exercise, you'll add a reusable `Accessibility Expert` custom agent and 
 
 1. Ask Copilot to work with the Accessibility Expert agent to produce an accessibility report for the Astro frontend with recommendations
 
-    ```
+    ```text
     Work with the the accessibility expert to review the Astro frontend code and produce an accessibility report with specific recommendations for improvements based on WCAG 2.2 AA standards.
     ```
 
     Notice that the main agent passes the task to the Accessibility Expert agent, which then finds the custom instructions for Astro/React you created earlier, tracks the relevant files and produces a report with specific, actionable recommendations that reference WCAG success criteria and specific selectors in the code.
     
-    > [!TIP]
-    > If the agent fails to reference the instructions you created, this creates an opportunity to improve its behavior by adding a rule in the agent definition file that explicitly instructs it to always check for relevant instruction files in the repository and apply them when working on tasks that match the scope. 
+    If the agent fails to reference the instructions you created, this creates an opportunity to improve its behavior by adding a rule in the agent definition file that explicitly instructs it to always check for relevant instruction files in the repository and apply them when working on tasks that match the scope.
 
 2. We'll leave this session and come back to it at a later exercise in this module, but before you do, **run `/rename` to rename the session to "Accessibility Report"** so you can easily identify it later when you return to it.
 
@@ -200,7 +198,7 @@ We'll import a skill that encodes the standard contribution flow: file an issue 
 
 This last exercise guides you to install the `make-repo-contribution` skill and use it to land the changes so far.
 
-1. Browse the [Awesome GitHub Copilot](https://awesome-copilot.github.com/) website and in the search bar, type "contribution" to find related customizations.
+1. Browse the [Awesome GitHub Copilot][awesome-copilot] website and in the search bar, type "contribution" to find related customizations.
 
 2. Select the **Skill** filter and find the `Make Repo Contribution - Skill`. Click on it.
 
@@ -222,14 +220,14 @@ Let's bring it all together now. You'll use the `make-repo-contribution` skill t
 
 2. Use `/agent` to switch to the Accessibility Expert agent, then run the following prompt:
 
-    ```
+    ```text
     The accessibility report you generated has some great recommendations. Pick one that you think would have a high impact but is not too complex to implement, create an issue then go ahead and implement it. Remember to follow the relevant custom instructions in the repo and when you're ready, commit and open a PR following the contribution standards we established.
     ```
 
     Observe as the agent works on the implementation and automatically invokes the `make-repo-contribution` skill when ready to land the change. The agent should first create an issue using the provided template, then commit the change, push to a new branch and open a PR linking the issue, all through the skill's workflow.
 
-    > [!NOTE]
-    > Compare what just happened to the manual push and PR you opened at the end of Exercise 2. The skill enforced the same steps with issue, branch, commit, PR, linked issue - but as a single, consistent unit. For Contoso, that means every AI-driven contribution follows the same auditable flow regardless of who (or what) triggered it.
+> [!NOTE]
+> Compare what just happened to the manual push and PR you opened at the end of Exercise 2. The skill enforced the same steps with issue, branch, commit, PR, linked issue - but as a single, consistent unit. For Contoso, that means every AI-driven contribution follows the same auditable flow regardless of who (or what) triggered it.
 
 3. Navigate to your repository on GitHub.com, open each PR, review the changes and merge both into `main`.
 
@@ -258,15 +256,7 @@ Next, you'll close the loop on accessibility with **Playwright tests** and offlo
 
 [previous-lesson]: ./01-working-with-copilot-cli.md
 [next-lesson]: ./03-test-suite-remote-delegation.md
-[s05]: ./05-add-feature-barcode.md
-[s06]: ./06-modernize-apps.md
-[s07]: ./07-manage-infrastructure.md
-[copilot-instructions]: https://docs.github.com/copilot/how-tos/configure-custom-instructions/add-repository-instructions
 [copilot-cli-docs]: https://docs.github.com/copilot/how-tos/copilot-cli
-[agents-md]: https://agents.md
-[copilot-memory]: https://docs.github.com/copilot/concepts/agents/copilot-memory
-[custom-agents]: https://docs.github.com/copilot/concepts/agents/about-custom-agents
-[copilot-skills]: https://docs.github.com/copilot/concepts/agents/about-agent-skills
 [awesome-copilot]: https://awesome-copilot.github.com/
 [commands-reference]: https://docs.github.com/copilot/reference/copilot-cli-reference/cli-command-reference
 [cli-customization-comparison]: https://docs.github.com/copilot/concepts/agents/copilot-cli/comparing-cli-features
