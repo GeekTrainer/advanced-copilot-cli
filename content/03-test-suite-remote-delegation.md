@@ -39,10 +39,7 @@ This section covers:
 
 - `/remote`, which gives you remote control of the Copilot CLI session already running in your terminal or codespace.
 - `/delegate`, which hands scoped work to Copilot cloud agent.
-- Copilot cloud agent, the hosted agent that creates a branch, commits changes, and opens a draft pull request.
 - Test-guided agent work: create a test, read the failure, make a narrow fix, then rerun the command.
-
-<img src="images/03-copilot-work-surfaces.png" alt="Three Copilot work surfaces compared side by side: local Copilot CLI, remote control with slash remote, and delegation with slash delegate" width="800"/>
 
 ## Choosing the right place for the work
 
@@ -54,6 +51,8 @@ Not every task belongs in the same agent session. Some work needs you in the loo
 | `/remote` | The same active CLI session, controlled from GitHub.com or GitHub Mobile | Watching longer commands, approving prompts while away, checking progress from another device | The original machine or codespace must stay online |
 | `/delegate` | Copilot cloud agent on GitHub | Test backfills and other scoped work with commands that prove success | Uncommitted local changes may not be available to the cloud agent |
 
+<img src="images/03-copilot-work-surfaces.png" alt="Three Copilot work surfaces compared side by side: local Copilot CLI, remote control with slash remote, and delegation with slash delegate" width="800"/>
+
 > [!IMPORTANT]
 > `/remote` does not move the work to a hosted runner. It gives you remote control of the session that is already running. Use `/delegate` when you want Copilot cloud agent to work on GitHub in the background.
 
@@ -62,6 +61,8 @@ Not every task belongs in the same agent session. Some work needs you in the loo
 In this exercise, you'll ask Copilot CLI to add the first Playwright tests for the AssetTrack web UI. Keep the first pass small. The point is to get a real test harness running, then use the results to validate the accessibility work from Section 2.
 
 <img src="images/03-test-evidence-loop.png" alt="Playwright evidence loop showing scaffold, run, classify, fix narrowly, rerun, and commit evidence" width="800"/>
+
+### Phase 1: Confirm the app and environment
 
 1. Open your fork of `GeekTrainer/legacy-app` in a codespace.
 2. Open a terminal with <kbd>Ctrl</kbd> + <kbd>`</kbd>.
@@ -84,30 +85,40 @@ In this exercise, you'll ask Copilot CLI to add the first Playwright tests for t
     http://localhost:4321
     ```
 
+    You should see the AssetTrack web UI before continuing.
+
 > [!NOTE]
 > In Codespaces, use the forwarded port URL for port 4321 if `http://localhost:4321` does not open from your browser. You can find it in the **Ports** tab.
 
 6. Stop the dev server with <kbd>Ctrl</kbd> + <kbd>C</kbd> before continuing.
-7. Start Copilot CLI from the repository root:
+
+### Phase 2: Inspect the current test setup
+
+1. Start Copilot CLI from the repository root:
 
     ```bash
     copilot
     ```
 
-8. If prompted to trust the folder, approve access for the session. If Copilot asks about session sync, use the option your instructor recommends.
-9. Ask Copilot to inspect the current test setup:
+2. If prompted to trust the folder, approve access for the session.
+3. Ask Copilot to inspect the current test setup:
 
     ```text
     Inspect this repository's current test setup. Summarize what test frameworks already exist, which services have tests, which services are missing tests, and where a Playwright browser test suite should live. Do not edit files yet.
     ```
 
-10. Review the response. Copilot should find:
+4. Review the response. Copilot should find:
     - xUnit tests under `services/assets-svc/Tests/`.
     - a Spring Boot context test under `services/workforce-svc/src/test/`.
     - an intentionally empty `services/reporting-svc/tests/` folder.
     - no Playwright setup for `services/web` yet.
     - a good reason to put the Playwright config at the repo root, since the tests need to start the full app with `npm run dev`.
-11. Ask Copilot to scaffold Playwright:
+
+If Copilot misses the empty reporting tests folder or suggests putting Playwright only inside `services/web`, ask it to inspect the repository scripts and service folders again before editing files.
+
+### Phase 3: Scaffold the Playwright foundation
+
+1. Ask Copilot to scaffold Playwright:
 
     ```text
     Add a minimal Playwright browser test setup for the AssetTrack web UI.
@@ -123,7 +134,7 @@ In this exercise, you'll ask Copilot CLI to add the first Playwright tests for t
     - After editing, run the install or test command needed to verify the setup. A normal first setup may add @playwright/test and run npx playwright install chromium. In Codespaces, npx playwright install --with-deps chromium may be needed.
     ```
 
-12. Review the permission prompts before approving them. A reasonable first result is:
+2. Review the permission prompts before approving them. A reasonable first result is:
 
     ```text
     playwright.config.ts
@@ -132,13 +143,17 @@ In this exercise, you'll ask Copilot CLI to add the first Playwright tests for t
     package-lock.json
     ```
 
-13. Before running the whole app, ask Copilot to check that Playwright can see the tests:
+3. Before running the whole app, ask Copilot to check that Playwright can see the tests:
 
     ```text
     Run npx playwright test --list and confirm the accessibility tests are discovered. If the command fails, fix only the Playwright setup.
     ```
 
-14. Ask Copilot to add focused accessibility tests:
+    A useful result names `npx playwright test --list`, reports at least one test under `tests/playwright/`, and does not require application source changes. If the command finds zero tests, stay in setup mode and fix the Playwright config or test file path before continuing.
+
+### Phase 4: Add focused accessibility coverage
+
+1. Ask Copilot to add focused accessibility tests:
 
     ```text
     Create the first Playwright accessibility tests for AssetTrack.
@@ -156,32 +171,26 @@ In this exercise, you'll ask Copilot CLI to add the first Playwright tests for t
 > [!NOTE]
 > If `getByLabel` fails, read the failure carefully. A visible label is not enough if it is not connected to the input, select, or textarea. That is exactly the kind of issue these tests should catch.
 
-15. Run the Playwright tests:
+2. Run the Playwright tests:
 
     ```text
     Run the Playwright tests and summarize the result. If any tests fail, classify each failure as one of: test bug, app accessibility gap, or environment/startup issue. Do not change production code yet.
     ```
 
-16. Review the output. You may see form labels that are not associated with controls, keyboard focus problems, or service startup issues.
-17. If the test setup is broken, keep the fix limited to the setup:
+3. Review the output. You may see form labels that are not associated with controls, keyboard focus problems, or service startup issues. A useful result includes the command run, how many tests were found, the pass/fail count, each failure category, and the next action Copilot recommends.
+4. If the test setup is broken, keep the fix limited to the setup:
 
     ```text
     Fix only the Playwright setup or test code needed to make the tests run reliably. Do not change application source files yet. Keep the scope limited to playwright.config.ts, tests/playwright/**, and package files.
     ```
 
-18. If the failures point to real accessibility gaps, use the custom agent from Section 2 for a narrow follow-up fix. If Copilot does not automatically switch to the right agent, run `/agent`, select `accessibility-updater`, and then send the prompt:
+5. If the failures point to real accessibility gaps, use the custom agent from Section 2 for a narrow follow-up fix. If Copilot does not automatically switch to the right agent, run `/agent`, select `accessibility-updater`, and then send the prompt:
 
     ```text
     Fix only the accessibility gaps identified by the failing Playwright tests. Keep the changes narrow: associate labels with their controls, add missing landmark labels if needed, and avoid visual redesigns. After the fix, rerun npm run test:e2e and summarize the before/after result.
     ```
 
-19. Review the test evidence Copilot gives you. A useful summary should include:
-    - the command it ran.
-    - how many tests Playwright found.
-    - the pass/fail count.
-    - each failure classified as a test bug, app accessibility gap, or environment/startup issue.
-    - the next action Copilot recommends.
-20. Review the diff. You want either a passing validation result or a small app change backed by a test result. Commit the Playwright foundation. Commit the accessibility fix only if one was needed.
+6. Review the diff. You want either a passing validation result or a small app change backed by a test result. Commit the Playwright foundation. Commit the accessibility fix only if one was needed.
 
     Suggested commit messages:
 
@@ -226,14 +235,14 @@ In this exercise, you'll enable remote control for the running Copilot CLI sessi
     ```
 
 6. Watch the session from the browser or mobile app. If Copilot asks for permission to run commands, respond from the remote UI.
-7. If you expect to step away while the machine or codespace keeps working, enter this in the CLI session:
+7. Optional: if you expect to step away while the machine or codespace keeps working, keep the session marked busy:
 
     ```text
     /keep-alive busy
     ```
 
 > [!TIP]
-> If your Copilot CLI version does not recognize `/keep-alive`, keep the codespace or machine active using your instructor's environment guidance. Remote control lets you steer the session, but it cannot keep a stopped terminal session alive.
+> Use `/keep-alive busy` only when your environment might idle during longer commands. If your Copilot CLI version does not recognize `/keep-alive`, keep the codespace or machine active using your instructor's environment guidance. Remote control lets you steer the session, but it cannot keep a stopped terminal session alive.
 
 8. When you are done testing remote control, enter:
 
