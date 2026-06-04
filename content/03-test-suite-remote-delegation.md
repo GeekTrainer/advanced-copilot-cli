@@ -9,7 +9,7 @@ Your first job is to make that signal real. You'll ask Copilot CLI to scaffold a
 
 Then you'll stretch the workflow beyond one terminal. `/remote` lets you steer the active CLI session from GitHub.com or GitHub Mobile, while `/delegate` sends the larger test backfill to Copilot cloud agent. The goal is the rhythm developers actually need: test the fragile path, read the result, fix only what the evidence supports, and hand agents work with enough context that the pull request is reviewable.
 
-<img src="imgs/03-test-backed-workflow.png" alt="Test-backed agent workflow showing Section 2 accessibility work flowing into Playwright tests, failure diagnosis, remote control, delegation, and pull request review" width="800"/>
+<img src="images/03-test-backed-workflow.png" alt="Test-backed agent workflow showing Section 2 accessibility work flowing into Playwright tests, failure diagnosis, remote control, delegation, and pull request review" width="800"/>
 
 ## What you will learn
 
@@ -42,7 +42,7 @@ This section covers:
 - Copilot cloud agent, the hosted agent that creates a branch, commits changes, and opens a draft pull request.
 - Test-guided agent work: create a test, read the failure, make a narrow fix, then rerun the command.
 
-<img src="imgs/03-copilot-work-surfaces.png" alt="Three Copilot work surfaces compared side by side: local Copilot CLI, remote control with slash remote, and delegation with slash delegate" width="800"/>
+<img src="images/03-copilot-work-surfaces.png" alt="Three Copilot work surfaces compared side by side: local Copilot CLI, remote control with slash remote, and delegation with slash delegate" width="800"/>
 
 ## Choosing the right place for the work
 
@@ -61,7 +61,7 @@ Not every task belongs in the same agent session. Some work needs you in the loo
 
 In this exercise, you'll ask Copilot CLI to add the first Playwright tests for the AssetTrack web UI. Keep the first pass small. The point is to get a real test harness running, then use the results to validate the accessibility work from Section 2.
 
-<img src="imgs/03-test-evidence-loop.png" alt="Playwright evidence loop showing scaffold, run, classify, fix narrowly, rerun, and commit evidence" width="800"/>
+<img src="images/03-test-evidence-loop.png" alt="Playwright evidence loop showing scaffold, run, classify, fix narrowly, rerun, and commit evidence" width="800"/>
 
 1. Open your fork of `GeekTrainer/legacy-app` in a codespace.
 2. Open a terminal with <kbd>Ctrl</kbd> + <kbd>`</kbd>.
@@ -204,7 +204,7 @@ Remote control and delegation solve different problems:
 
 Remote control is handy when a task takes a while, such as installing Playwright browsers, starting several services, or waiting for browser tests to finish.
 
-<img src="imgs/03-remote-control-flow.png" alt="Remote control flow showing GitHub.com and GitHub Mobile steering the same active Copilot CLI session running in a terminal or codespace" width="800"/>
+<img src="images/03-remote-control-flow.png" alt="Remote control flow showing GitHub.com and GitHub Mobile steering the same active Copilot CLI session running in a terminal or codespace" width="800"/>
 
 ## Exercise: Use `/remote` to steer the session from GitHub
 
@@ -252,7 +252,7 @@ The next exercise uses `/delegate`, which sends work to Copilot cloud agent. The
 
 This is where the chapter shifts from local help to team workflow. You define a test backlog item, send it to the cloud agent, and review the PR like you would review a teammate's work.
 
-<img src="imgs/03-delegation-handoff-flow.png" alt="Delegation handoff flow showing a local branch and delegation brief sent through slash delegate to Copilot cloud agent, which opens a draft pull request for human review" width="800"/>
+<img src="images/03-delegation-handoff-flow.png" alt="Delegation handoff flow showing a local branch and delegation brief sent through slash delegate to Copilot cloud agent, which opens a draft pull request for human review" width="800"/>
 
 Good delegation prompts include:
 
