@@ -25,7 +25,7 @@ In this lesson, you will learn:
 ## Scenario
 
 > [!NOTE]
-> Starting state: your writable fork contains the AI infrastructure from [Section 2][previous-lesson], including repository instructions, scoped instructions, issue and PR templates, and the `accessibility-updater` custom agent. Do not start this section from a fresh clone of the upstream `GeekTrainer/legacy-app` repository because the delegation exercise needs a fork you can push to and Section 2 state the cloud agent can see. If you used the agent to make accessibility updates, commit those changes before starting this section. If you only created and smoke-tested the agent but did not apply accessibility fixes, some Playwright tests may fail. That's useful information, not a disaster. Exercises target your fork only.
+> Start from your writable AssetTrack repository with the Section 2 AI infrastructure committed. A fresh fork of `GeekTrainer/legacy-app` works for the local Playwright steps, but it will not have the `accessibility-updater` agent or other Section 2 resources needed for the full delegation flow.
 
 You're still working on AssetTrack, Contoso Industries' internal asset-tracking app. The app has a few backend smoke tests, but the UI has no browser test coverage yet. That leaves the team guessing when accessibility changes are made.
 
@@ -64,15 +64,15 @@ In this exercise, you'll ask Copilot CLI to add the first Playwright tests for t
 
 ### Phase 1: Confirm the app and environment
 
-1. Open your fork of `GeekTrainer/legacy-app` in a codespace.
+1. Open the AssetTrack repository you created from the `GeekTrainer/legacy-app` template in Section 0 in a codespace.
 2. Open a terminal with <kbd>Ctrl</kbd> + <kbd>`</kbd>.
-3. Confirm you are working in the codespace or devcontainer for your fork. Section 0 set this up as the course path. AssetTrack needs Node, .NET, Python, Java, and Maven. The devcontainer installs those tools for you. If you run locally outside the devcontainer, use the setup guidance in the `legacy-app` README before continuing. Also confirm `origin` points to your writable fork, not the upstream `GeekTrainer/legacy-app` repository:
+3. Confirm you are working in the codespace or devcontainer for your AssetTrack repository. Section 0 set this up as the course path. AssetTrack needs Node, .NET, Python, Java, and Maven. The devcontainer installs those tools for you. If you run locally outside the devcontainer, use the setup guidance in the `legacy-app` README before continuing. Also confirm `origin` points to your writable AssetTrack repository, not the upstream `GeekTrainer/legacy-app` template repository:
 
     ```bash
     git remote -v
     ```
 
-    The fetch and push URLs should point to your fork. If they point to `GeekTrainer/legacy-app`, stop and open your fork instead, or add your fork as the push target before continuing.
+    The fetch and push URLs should point to your AssetTrack repository. If they point to `GeekTrainer/legacy-app`, stop and open your repository from Section 0 instead, or add your writable repository as the push target before continuing.
 
 4. Confirm dependencies are installed. The devcontainer normally runs `npm install && npm run install:all` when it is created. If you see missing package errors, run:
 
@@ -192,7 +192,7 @@ If Copilot misses the empty reporting tests folder or suggests putting Playwrigh
     Fix only the Playwright setup or test code needed to make the tests run reliably. Do not change application source files yet. Keep the scope limited to playwright.config.ts, tests/playwright/**, and package files.
     ```
 
-5. If the failures point to real accessibility gaps, use the custom agent from Section 2 for a narrow follow-up fix. Before switching agents, confirm your fork still has the Section 2 agent files and instructions. If the `accessibility-updater` agent is missing, return to Section 2 to recreate it before continuing, or make a direct narrow fix only if your instructor tells you to proceed without the custom agent. If Copilot does not automatically switch to the right agent, run `/agent`, select `accessibility-updater`, and then send the prompt:
+5. If the failures point to real accessibility gaps, use the custom agent from Section 2 for a narrow follow-up fix. Before switching agents, confirm your AssetTrack repository still has the Section 2 agent files and instructions. If the `accessibility-updater` agent is missing, return to Section 2 to recreate it before continuing, or make a direct narrow fix only if your instructor tells you to proceed without the custom agent. If Copilot does not automatically switch to the right agent, run `/agent`, select `accessibility-updater`, and then send the prompt:
 
     ```text
     Fix only the accessibility gaps identified by the failing Playwright tests. Keep the changes narrow: associate labels with their controls, add missing landmark labels if needed, and avoid visual redesigns. After the fix, rerun npm run test:e2e and summarize the before/after result.
@@ -262,7 +262,7 @@ In this exercise, you'll enable remote control for the running Copilot CLI sessi
 You can also enter `/remote` without an argument to check the current status.
 
 > [!NOTE]
-> If Copilot reports that remote sessions are disabled because the current folder is not a GitHub repository, confirm you started Copilot from the root of your fork of `legacy-app`. Remote control also does not fix missing local dependencies. If the original environment cannot install Playwright browsers or start the app, fix that environment or switch to the course codespace.
+> If Copilot reports that remote sessions are disabled because the current folder is not a GitHub repository, confirm you started Copilot from the root of your AssetTrack repository. Remote control also does not fix missing local dependencies. If the original environment cannot install Playwright browsers or start the app, fix that environment or switch to the course codespace.
 
 ## Authoring delegation prompts that work
 
@@ -298,7 +298,7 @@ The brief should live in the repo so the prompt can point to a real artifact and
 
 In this exercise, you'll create a delegation brief and send it to Copilot cloud agent. The primary job is to expand the Playwright accessibility coverage you started locally. Since the cloud agent will already be working in the test suite, you'll also ask it to backfill a few unit tests for the .NET asset service and the Python reporting service. That gives the agent a bounded backlog item with commands that prove whether it worked.
 
-This exercise creates external GitHub state: a branch, commits, a push to your fork, a cloud agent task, and a draft pull request. Before you start, make sure `git remote -v` shows a writable fork remote and that you are ready to create those artifacts in your fork. If your clone points only to `GeekTrainer/legacy-app`, fix the remote before committing or delegating.
+This exercise creates external GitHub state: a branch, commits, a push to your AssetTrack repository, a cloud agent task, and a draft pull request. Before you start, make sure `git remote -v` shows a writable repository remote and that you are ready to create those artifacts in your repository. If your clone points only to `GeekTrainer/legacy-app`, fix the remote before committing or delegating.
 
 1. Ask Copilot CLI to create a delegation brief:
 
@@ -348,7 +348,7 @@ This exercise creates external GitHub state: a branch, commits, a push to your f
 6. After the diff summary looks right, ask Copilot to create the branch, commit, and push:
 
     ```text
-    Create a branch named test-suite-foundation. Commit the Playwright foundation and delegation brief with the message "test: add Playwright accessibility foundation". If there is a narrow accessibility fix, use a second commit with the message "fix: address accessibility gaps found by Playwright". Then push the branch to my fork.
+    Create a branch named test-suite-foundation. Commit the Playwright foundation and delegation brief with the message "test: add Playwright accessibility foundation". If there is a narrow accessibility fix, use a second commit with the message "fix: address accessibility gaps found by Playwright". Then push the branch to my AssetTrack repository.
     ```
 
 > [!WARNING]
@@ -357,7 +357,7 @@ This exercise creates external GitHub state: a branch, commits, a push to your f
 7. Confirm the pushed branch contains the delegation brief before using `/delegate`:
 
     ```text
-    Verify that docs/delegations/test-backfill.md exists on the pushed test-suite-foundation branch in my fork. Use GitHub or gh to check the remote branch, not just the local working tree. Do not delegate until the brief is visible on GitHub.
+    Verify that docs/delegations/test-backfill.md exists on the pushed test-suite-foundation branch in my AssetTrack repository. Use GitHub or gh to check the remote branch, not just the local working tree. Do not delegate until the brief is visible on GitHub.
     ```
 
     If the brief is missing from the remote branch, push the missing commit before continuing.
@@ -367,7 +367,7 @@ This exercise creates external GitHub state: a branch, commits, a push to your f
     /delegate Use the pushed test-suite-foundation branch and docs/delegations/test-backfill.md as the source of truth. If the branch context does not include that file, use this brief summary: primary goal, expand Playwright accessibility coverage under tests/playwright using role and label locators for dashboard, navigation, asset list filters, and new asset form behaviors; secondary goal, add xUnit coverage for services/assets-svc covering create, read, update, delete, search, stats-by-status, and not-found edge cases, and add pytest coverage for services/reporting-svc covering warranty-expiring reports, utilization reports, and CSV import behavior. Keep production application code unchanged. If production behavior blocks a test, document the gap in the PR instead of fixing it. Open a draft pull request with the title "Add test suite backfill" and include the commands you ran plus their results in the PR description.
     ```
 
-9. Copilot may ask to create a checkpoint commit or confirm the target repository. Review the prompt and approve only if it points to your fork. If Copilot still reports uncommitted generated artifacts, cancel the delegation, clean the working tree, and try again.
+9. Copilot may ask to create a checkpoint commit or confirm the target repository. Review the prompt and approve only if it points to your AssetTrack repository. If Copilot still reports uncommitted generated artifacts, cancel the delegation, clean the working tree, and try again.
 10. Once the cloud agent starts, Copilot CLI provides links to the agent session and the draft pull request when it is created.
 11. While the cloud agent works, continue reviewing the local Playwright results:
 
@@ -382,7 +382,7 @@ This exercise creates external GitHub state: a branch, commits, a push to your f
     ```
 
 13. Review the PR against this checklist:
-    - The PR targets your fork and the expected branch.
+    - The PR targets your AssetTrack repository and the expected branch.
     - The PR description references `docs/delegations/test-backfill.md`.
     - Playwright tests live under `tests/playwright/`.
     - Asset service tests live under `services/assets-svc/Tests/`.
@@ -424,7 +424,7 @@ This exercise creates external GitHub state: a branch, commits, a push to your f
     npm --prefix services/web run build
     ```
 
-At the end of this section, your fork should contain the Playwright foundation, a validation result for the Section 2 accessibility work, any narrow follow-up accessibility fix that was needed, and a delegation brief. The delegated PR should primarily expand Playwright accessibility coverage, with xUnit and pytest backfill included as secondary work. The exact test file names matter less than the behaviors covered and the commands that prove they work.
+At the end of this section, your AssetTrack repository should contain the Playwright foundation, a validation result for the Section 2 accessibility work, any narrow follow-up accessibility fix that was needed, and a delegation brief. The delegated PR should primarily expand Playwright accessibility coverage, with xUnit and pytest backfill included as secondary work. The exact test file names matter less than the behaviors covered and the commands that prove they work.
 
 ## Summary
 

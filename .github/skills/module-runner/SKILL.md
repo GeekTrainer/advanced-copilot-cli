@@ -62,7 +62,15 @@ module-runs/<module-number>-<module-slug>-<timestamp>/
 
 Do not run learner commands from the course root unless the module explicitly says the learner should work in the course repository. The course root is for reading module content and writing the issue report.
 
-If the module names a target learner repository, such as the Section 3 instruction to open a fork of `GeekTrainer/legacy-app`, clone or copy that repository into `learner-workspace/` and run the module there. Prefer a fresh clone or copy so the complete resulting state is preserved for review. If the target repository, fork URL, branch, or credentials are not available, stop before the first dependent learner step and record a missing-prerequisite or external-service blocker in the issue report.
+If the module names a target learner repository, such as the Section 3 instruction to open an AssetTrack repository created from the `GeekTrainer/legacy-app` template, clone or copy that repository into `learner-workspace/` and run the module there. Prefer a fresh clone or copy so the complete resulting state is preserved for review. If the target repository, repository URL, branch, or credentials are not available, stop before the first dependent learner step and record a missing-prerequisite or external-service blocker in the issue report.
+
+### GitHub template repository setup
+
+Some modules depend on a learner-owned repository created from a GitHub template, such as Section 0's AssetTrack repository created from `GeekTrainer/legacy-app`. If the user provides the upstream template repository, a wrong repository, or no writable learner repository, you may offer to create a temporary learner repository from the template with GitHub CLI.
+
+Template repository creation is an external GitHub side effect. Before running `gh repo create --template`, ask for explicit approval with the target owner, repository name, visibility, and cleanup expectation. Do not create, push to, delegate from, or delete a GitHub repository without explicit user approval.
+
+When approved, use a unique repository name that includes the module number and timestamp, unless the user provides a name. Record the template source, created repository URL, visibility, command output, and cleanup expectation in `logs/transcript.md` and `logs/commands.md`. Clone the created repository into `learner-workspace/` and run the module from that clone. If creation fails because of permissions, naming conflicts, missing authentication, organization policy, or unavailable template access, record an external-service blocker and stop before dependent learner steps.
 
 Keep `module-runs/` after the run finishes. Do not delete or overwrite it. Include the run root path in `issues/<module-number>-issues.md` so reviewers can inspect the final learner workspace, logs, and artifacts.
 
