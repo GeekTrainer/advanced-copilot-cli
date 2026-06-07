@@ -64,6 +64,26 @@ Do not run learner commands from the course root unless the module explicitly sa
 
 If the module names a target learner repository, such as the Section 3 instruction to open an AssetTrack repository created from the `GeekTrainer/legacy-app` template, clone or copy that repository into `learner-workspace/` and run the module there. Prefer a fresh clone or copy so the complete resulting state is preserved for review. If the target repository, repository URL, branch, or credentials are not available, stop before the first dependent learner step and record a missing-prerequisite or external-service blocker in the issue report.
 
+### Chapter assets and catch-up setup
+
+Before running learner actions, check whether the course repository has chapter-specific assets under `assets/<module-number>/`. Read any `README.md` files there and decide whether the module depends on those assets for a jump-in learner path or prerequisite catch-up.
+
+If the module has catch-up assets that are required for a valid test run, apply them to the learner repository after the learner repository is cloned or copied and before dependency install, devcontainer setup, Copilot prompts, app startup, commits, pushes, or delegation. For example, Section 3 provides `assets/03/section-02-catchup/` to add the Section 2 AI infrastructure to a fresh AssetTrack repository.
+
+When a catch-up folder provides scripts, run the appropriate script from the course repo host and pass the learner repository path explicitly:
+
+```bash
+bash assets/<module-number>/<catch-up-folder>/scripts/apply-*.sh <learner-repo-root>
+```
+
+On Windows, use the PowerShell script when available:
+
+```powershell
+pwsh -File assets/<module-number>/<catch-up-folder>/scripts/apply-*.ps1 -TargetRepo <learner-repo-root>
+```
+
+Do not force overwrites unless the user explicitly approves. If the script refuses to overwrite existing files, inspect the existing learner files, record the result, and continue only when the existing files satisfy the module's prerequisite state. Record the asset folder, script path, command, output, and copied artifact summary in `logs/commands.md` and `logs/transcript.md`.
+
 ### GitHub template repository setup
 
 Some modules depend on a learner-owned repository created from a GitHub template, such as Section 0's AssetTrack repository created from `GeekTrainer/legacy-app`. If the user provides the upstream template repository, a wrong repository, or no writable learner repository, you may offer to create a temporary learner repository from the template with GitHub CLI.

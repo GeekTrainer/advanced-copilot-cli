@@ -25,7 +25,19 @@ In this lesson, you will learn:
 ## Scenario
 
 > [!NOTE]
-> Start from your writable AssetTrack repository with the Section 2 AI infrastructure committed. A fresh fork of `GeekTrainer/legacy-app` works for the local Playwright steps, but it will not have the `accessibility-updater` agent or other Section 2 resources needed for the full delegation flow.
+> Start from your own AssetTrack repository, with the Section 2 AI infrastructure committed.
+
+If you're jumping directly to this section, make sure you've gone through the [prerequisites][prerequisites] and created your AssetTrack repository first. Then apply the Section 2 catch-up assets from this course repository:
+
+```bash
+bash assets/03/section-02-catchup/scripts/apply-section-02-catchup.sh /path/to/your/AssetTrack
+```
+
+```powershell
+pwsh -File assets/03/section-02-catchup/scripts/apply-section-02-catchup.ps1 -TargetRepo C:\path\to\your\AssetTrack
+```
+
+The catch-up assets live in `assets/03/section-02-catchup/` and add the Section 2 instructions, templates, `accessibility-updater` agent, and `make-repo-contribution` skill that this section expects.
 
 You're still working on AssetTrack, Contoso Industries' internal asset-tracking app. The app has a few backend smoke tests, but the UI has no browser test coverage yet. That leaves the team guessing when accessibility changes are made.
 
@@ -458,6 +470,7 @@ Next, you'll shape Copilot CLI's lifecycle with hooks so tests, builds, and lint
 
 [previous-lesson]: ./02-building-ai-infrastructure.md
 [next-lesson]: ./04-lifecycle-hooks.md
+[prerequisites]: ./00-prerequisites.md
 [remote-docs]: https://docs.github.com/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely
 [delegate-docs]: https://docs.github.com/copilot/how-tos/copilot-cli/use-copilot-cli/delegate-tasks-to-cca
 [cloud-agent]: https://docs.github.com/copilot/concepts/agents/cloud-agent/about-cloud-agent
