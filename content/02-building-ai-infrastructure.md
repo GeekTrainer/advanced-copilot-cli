@@ -11,6 +11,7 @@ A productive Copilot CLI session starts with the agent already knowing the basic
 - How `/init` seeds `copilot-instructions.md` and when to re-run it.
 - How to write path-scoped `.instructions.md` files for areas (and stacks) that need different rules.
 - What custom agents are, how they differ from skills and instructions, and how to author one for accessibility review.
+- How to run a custom agent as the default working mode for a focused task.
 - What agent skills are, how `/skills` discovers them, and how to import a skill (`make-repo-contribution`) that enforces issue → branch → templated PR.
 
 ## Scenario
@@ -24,11 +25,11 @@ You've already used Copilot to fill the obvious documentation gaps in AssetTrack
 
 Talking points:
 
-- **The instruction sources Copilot CLI loads** (combined, not priority-fallback):
+- Copilot CLI loads instructions from several sources and combines them. These include:
   - `AGENTS.md` (git root and cwd)
   - `.github/instructions/**/*.instructions.md` (path-scoped via `applyTo` globs)
   - `.github/copilot-instructions.md`
-  - `$HOME/.copilot/copilot-instructions.md` (user-level — applies across every repo on your machine)
+  - `~/.copilot/copilot-instructions.md` (user-level rules that apply to every Copilot CLI session across repositories on your machine)
   - Additional directories via `COPILOT_CUSTOM_INSTRUCTIONS_DIRS`
   - Sibling files like `CLAUDE.md` / `GEMINI.md` are also recognized.
 - **What `/init` does**: scans the repo and seeds `copilot-instructions.md` with a starting set of conventions inferred from what's there — stack, structure, build/test commands, observed patterns. It's a starting point, not a finished artifact.
@@ -44,9 +45,16 @@ Talking points:
 - **Goal**: produce a layered instructions setup for AssetTrack — a repo-wide baseline plus targeted rules for each stack.
 - **Files/areas touched**: `.github/copilot-instructions.md` (new, via `/init`), plus stack-scoped files such as `.github/instructions/java.instructions.md`, `.github/instructions/astro.instructions.md`, `.github/instructions/dotnet.instructions.md`, and `.github/instructions/flask.instructions.md`.
 - **Steps**:
-  - Run `/init` and review what Copilot generates. Refine to capture the AssetTrack specifics: the stacks (Java service, Astro/TypeScript frontend with React islands, .NET service, two FastAPI services), naming and project-layout conventions, "do" rules (parameterized SQL, server-side validation, accessibility), "don't" rules (don't auto-upgrade framework majors, don't change package names).
-  - Add per-stack `.instructions.md` files with `applyTo` globs targeting each stack's source paths. Codify the language- / framework-specific rules — for example: prefer f-strings and `pathlib` in FastAPI code; never use string concatenation to build SQL in Java repositories; favor server components and avoid client-side runtime in Astro unless necessary; follow standard .NET nullable-reference conventions in .NET projects.
+  - Run `/init` and review what Copilot generates. Refine to capture the AssetTrack specifics: naming and project-layout conventions, "do" rules (parameterized SQL, server-side validation, accessibility), and "don't" rules (don't auto-upgrade framework majors, don't change package names).
+  - Add one per-stack `.instructions.md` file with `applyTo` globs targeting each stack's source paths:
+    - Java for the workforce, audit, and auth services.
+    - Astro/TypeScript with React islands for the frontend.
+    - .NET for the asset service.
+    - Python for reporting and notification services.
+  - Each stack is different and needs its own conventions. Astro components need accessibility rules that do not apply to backend services, backend code needs SQL-safety rules that do not belong in frontend sessions, and FastAPI services should follow modern Python conventions that are not relevant in .NET contexts.
+  - Ask Copilot to draft each scoped instruction file, then refine the drafts so they match your actual repository conventions.
   - Run `/instructions` (or `/env`) to confirm all files are loaded.
+  - Capture a screenshot of the `/instructions` output showing the repo baseline and all scoped files loaded.
   - Commit locally (no push without your go-ahead).
 - **How to verify**: in a fresh session, ask Copilot to add a small helper in each stack. Confirm each proposed change follows the scoped rules.
 
@@ -69,6 +77,7 @@ Talking points:
 - **Files/areas touched**: a new agent definition in `.github/agents/accessibility-updater.md`.
 - **Steps**:
   - Author the agent with: persona ("expert front-end accessibility engineer"), scope (Astro components, templates, and a11y test files only), tool allowlist (file read/write, shell limited to test runners), and the rules to follow (WCAG-aligned changes only, keep current functionality, no styling rewrites beyond what a11y requires).
+  - Run `/models`, select **Auto** from the list, and press Enter.
   - Run `/agent` to confirm the agent is registered.
   - Smoke-test by asking the agent to review one Astro page and propose changes — review the diff but don't apply yet (we'll exercise this agent further in [Section 5][s05]).
 - **How to verify**: `/agent` lists `accessibility-updater`; the smoke-test review names specific WCAG criteria and specific selectors.
@@ -80,7 +89,7 @@ Talking points:
 - **What an agent skill is**: a packaged capability — a name, an instruction set, optional scripts and resources — that the agent can invoke when the task matches. Lives in `.copilot/skills/` (repo-scoped) or `~/.copilot/skills/` (user-scoped).
 - **Discovering skills**: `/skills` lists what's available; `/env` shows what's loaded.
 - **Importing community skills**: like any dependency, review the source before adopting. Prefer first-party / well-known publishers; check what tools the skill calls and what files it reads/writes.
-- **The `make-repo-contribution` skill**: encodes the standard contribution flow — file an issue, create a branch from main, make changes, push, open a PR with the right template, link the issue. When invoked, the agent walks this flow as a unit instead of improvising it each time.
+- **The `make-repo-contribution` skill**: encodes the standard contribution flow — file an issue, create a branch from main, make changes, push, open a PR with the right template, link the issue. In this exercise you'll run it on a small backlog task so you can watch the full flow and inspect the generated issue, branch, and PR artifacts before approving anything.
 - **Bootstrap your `.github` standards first**: issue templates and a PR template make the skill's output reviewable.
 
 ## Exercise: Author issue / PR templates and import `make-repo-contribution`
