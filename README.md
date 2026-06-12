@@ -34,7 +34,7 @@ You'll work the legacy app from [`geektrainer/legacy-app`][legacy-app] throughou
 
 ## What you'll learn
 
-Across the seven core modules of this course (plus a prerequisites section and a wrap-up) you will:
+Across the seven core modules of this course (plus a prerequisites module and a wrap-up) you will:
 
 - Understand what an AI agent is and how the Copilot CLI harness works under the hood, including how to control models, permissions, and modes — then use Copilot CLI to explore the repo and fill the obvious documentation gaps.
 - Build the AI infrastructure for a brownfield repo: generate `copilot-instructions.md` with `/init`, add path-scoped `.instructions` files, author a custom agent for accessibility, and import the `make-repo-contribution` skill so every Copilot contribution flows through issues and PRs.
@@ -48,19 +48,19 @@ Across the seven core modules of this course (plus a prerequisites section and a
 
 Each module is a single markdown file under [`content/`](./content/). Modules build on each other but each module's exercises include a starting-state note so you can drop in if you need to.
 
-1. [Environment setup][s00]
-2. [Working with Copilot CLI][s01]
-3. [Building an AI infrastructure foundation][s02]
-4. [Enhancing the test suite with remote and delegation][s03]
-5. [Shaping Copilot CLI's lifecycle with hooks][s04]
-6. [Adding a new feature: barcode support][s05]
-7. [Modernizing apps with Copilot CLI][s06]
-8. [Managing Copilot's infrastructure][s07]
-9. [Wrap-up and next steps][s08]
+1. [Environment setup][m00]
+2. [Working with Copilot CLI][m01]
+3. [Building an AI infrastructure foundation][m02]
+4. [Enhancing the test suite with remote and delegation][m03]
+5. [Shaping Copilot CLI's lifecycle with hooks][m04]
+6. [Adding a new feature: barcode support][m05]
+7. [Modernizing apps with Copilot CLI][m06]
+8. [Managing Copilot's infrastructure][m07]
+9. [Wrap-up and next steps][m08]
 
 ## Get started
 
-Head to [Module 0: Environment setup][s00] to get your environment ready.
+Head to [Module 0: Environment setup][m00] to get your environment ready.
 
 ## Module 3 catch-up assets
 
@@ -81,13 +81,13 @@ The script pulls from the [course source repository][course-source-repo] and cop
 This repository contains the **skeleton** for the course. Each module file captures the structure, talking points, and exercise outlines. Full prose, screenshots, and step-by-step content will be filled in by the course authors.
 
 [legacy-app]: https://github.com/geektrainer/legacy-app
-[s00]: ./content/00-prerequisites.md
-[s01]: ./content/01-working-with-copilot-cli.md
-[s02]: ./content/02-building-ai-infrastructure.md
-[s03]: ./content/03-test-suite-remote-delegation.md
-[s04]: ./content/04-lifecycle-hooks.md
-[s05]: ./content/05-add-feature-barcode.md
-[s06]: ./content/06-modernize-apps.md
-[s07]: ./content/07-manage-infrastructure.md
-[s08]: ./content/08-wrap-up.md
+[m00]: ./content/00-prerequisites.md
+[m01]: ./content/01-working-with-copilot-cli.md
+[m02]: ./content/02-building-ai-infrastructure.md
+[m03]: ./content/03-test-suite-remote-delegation.md
+[m04]: ./content/04-lifecycle-hooks.md
+[m05]: ./content/05-add-feature-barcode.md
+[m06]: ./content/06-modernize-apps.md
+[m07]: ./content/07-manage-infrastructure.md
+[m08]: ./content/08-wrap-up.md
 [course-source-repo]: https://github.com/GeekTrainer/advanced-copilot-cli

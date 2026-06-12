@@ -1,13 +1,13 @@
-# Section 2 - Building an AI infrastructure foundation
+# Module 2 — Building an AI infrastructure foundation
 
 | [← Previous: Working with Copilot CLI][previous-lesson] | [Next: Enhancing the test suite with remote and delegation →][next-lesson] |
 |:--|--:|
 
-Every time you start a fresh Copilot CLI session, the agent only sees your raw files in the working directory. Without shared instructions, guidlines and codified conventions, you have to keep re-explaining your stacks and re-establishing your coding standards. That repetition makes sessions much slower and produces inconsistent output, so in this section, we build the **AI infrastructure** that makes future interactions with Copilot faster and more accurate.
+Every time you start a fresh Copilot CLI session, the agent only sees your raw files in the working directory. Without shared instructions, guidlines and codified conventions, you have to keep re-explaining your stacks and re-establishing your coding standards. That repetition makes sessions much slower and produces inconsistent output, so in this module, we build the **AI infrastructure** that makes future interactions with Copilot faster and more accurate.
 
 ## What you will learn
 
-By the end of this section you will be able to:
+By the end of this module you will be able to:
 
 - Generate baseline & path-scoped instructions for Copilot
 - Understand where Copilot CLI looks for and applies different customizations including instructions, skills and agents 
@@ -19,7 +19,7 @@ By the end of this section you will be able to:
 Contoso has a set of best practices that need to be followed in every code change: stack-specific conventions, accessibility requirements (the organization is moving toward WCAG 2.2 AA), and a hard rule that every AI-generated change must flow through an issue and a pull request - no direct commits to main.
 
 > [!NOTE]
-> Starting state: your fork has the documentation updates from [Section 1][previous-lesson] merged.
+> Starting state: your fork has the documentation updates from [Module 1][previous-lesson] merged.
 
 ## Add custom instructions to Copilot CLI
 
@@ -241,7 +241,7 @@ In this module, you learned:
 - How to create path-scoped instruction files targeting specific stacks with relevant rules
 - To import custom agents from Awesome Copilot, a community-curated repo of ready-to-use customizations - and how to use them
 
-Next, you'll close the loop on accessibility with **Playwright tests** and offload the broader test backfill via `/remote` and `/delegate` in [Section 3][next-lesson].
+Next, you'll close the loop on accessibility with **Playwright tests** and offload the broader test backfill via `/remote` and `/delegate` in [Module 3][next-lesson].
 
 ## Resources
 

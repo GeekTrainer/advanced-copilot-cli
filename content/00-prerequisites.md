@@ -1,4 +1,4 @@
-# Section 0 — Prerequisites and environment setup
+# Module 0 — Prerequisites and environment setup
 
 |  | [Next: Getting started with Copilot CLI →][next-lesson] |
 |:--|--:|
@@ -56,7 +56,7 @@ Before pointing Copilot CLI at the codebase, you need to know the app runs in it
 
 ## Install and authenticate Copilot CLI
 
-Copilot CLI is the primary tool you'll spend the rest of the course driving, so the final setup step is to get it installed, signed in, and verified inside the codespace. You'll do this in a second terminal so the app keeps running undisturbed in the first one — that side-by-side layout (app on the left, agent on the right) is the workflow you'll use for every exercise that follows. Authenticating once now means later sections can jump straight into prompting instead of stopping to handle a login flow.
+Copilot CLI is the primary tool you'll spend the rest of the course driving, so the final setup step is to get it installed, signed in, and verified inside the codespace. You'll do this in a second terminal so the app keeps running undisturbed in the first one — that side-by-side layout (app on the left, agent on the right) is the workflow you'll use for every exercise that follows. Authenticating once now means later modules can jump straight into prompting instead of stopping to handle a login flow.
 
 1. In your codespace, press <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>`</kbd> to open a new terminal.
 2. Install Copilot CLI by following the [official install instructions][copilot-cli-install].
@@ -67,7 +67,7 @@ Copilot CLI is the primary tool you'll spend the rest of the course driving, so 
 
 ## Summary
 
-With the environment in place, you're ready to start driving Copilot CLI against a real codebase. You created your own copy of AssetTrack from a template, launched it in a Codespace backed by the course's custom devcontainer, confirmed the app boots end-to-end, and got Copilot CLI installed and authenticated in a second terminal. That side-by-side setup — app running in one terminal, agent in another — is the workflow every remaining section builds on.
+With the environment in place, you're ready to start driving Copilot CLI against a real codebase. You created your own copy of AssetTrack from a template, launched it in a Codespace backed by the course's custom devcontainer, confirmed the app boots end-to-end, and got Copilot CLI installed and authenticated in a second terminal. That side-by-side setup — app running in one terminal, agent in another — is the workflow every remaining module builds on.
 
 In this lesson, you:
 

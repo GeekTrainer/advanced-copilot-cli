@@ -70,10 +70,12 @@ Use admonitions sparingly — at most one per section, and never two in a row. I
 
 ## Course-content specifics
 
-- The repo's narrative voice is concise and direct. Avoid filler ("In this section, we will…", "Let's go ahead and…"). Cut sentences that don't add information.
+- The repo's narrative voice is concise and direct. Avoid filler ("In this module, we will…", "Let's go ahead and…"). Cut sentences that don't add information.
 - Don't anthropomorphize Copilot CLI ("Copilot is excited to help", "Copilot understands"). Describe what the tool does, not what it "thinks" or "feels".
 - In example commands shown in prose, prefer non-destructive forms. Use `rm -r` rather than `rm -rf` so a reader who copy-pastes still has a chance to abort.
 - Module files live in `content/` and are numbered `NN-short-slug.md`. The H1 is the module title. Cross-link adjacent modules via link reference definitions at the bottom of the file (see existing modules for the pattern).
+- Call the numbered course units "Module" — never "Section". This applies to H1 titles (`# Module 3 — ...`), cross-references in prose ("from Module 2", "in Modules 2–3"), and link text (`[Module 4][m04]`). Reserve the word "section" for an actual sub-part of a document, such as a heading within a module or a section of a generated report.
+- Name module link reference labels `mNN` to match the file number (`[m04]: ./04-lifecycle-hooks.md`), not `sNN` or other prefixes.
 
 ## Validation checklist
 
@@ -88,6 +90,7 @@ When writing or reviewing a markdown change, confirm:
 - [ ] URLs have no `/en/` or other locale codes in the path.
 - [ ] Headings use ATX style with a space after `#` and sentence case.
 - [ ] Product names match canonical casing (`GitHub`, `Copilot CLI`, `.NET`, `FastAPI`, `AssetTrack`).
+- [ ] Numbered course units are called "Module" (not "Section") in titles, prose, and link text, and use `mNN` reference labels.
 
 [gfm-spec]: https://github.github.com/gfm/
 [gh-style-filenames]: https://docs.github.com/contributing/style-guide-and-content-model/style-guide#file-names-and-directory-names

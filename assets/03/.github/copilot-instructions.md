@@ -9,7 +9,7 @@ AssetTrack is a polyglot microservices application used by Contoso Industries to
 - `services/workforce-svc/` contains the Java 21 Spring Boot workforce service.
 - `services/reporting-svc/` and `services/notifications-svc/` contain Python FastAPI services.
 - `services/audit-svc/` and `services/auth-svc/` contain legacy Java 11 Spring Boot services.
-- `tests/playwright/` contains browser tests when Section 03 adds the Playwright foundation.
+- `tests/playwright/` contains browser tests when Module 03 adds the Playwright foundation.
 
 ## Commands
 
