@@ -33,7 +33,7 @@ Copilot CLI loads instructions from several sources and combines them. The sourc
 
 - `.github/copilot-instructions.md` - for rules that apply to every session within the context of the repository
 - `.github/instructions/**/*.instructions.md` - for rules that apply to a specific area of the codebase following a defined path pattern
-- `$HOME/.copilot/copilot-instructions.md` - for user-level rules that apply to every Copilot CLI session across repositories on your machine
+- `~/.copilot/copilot-instructions.md` - for user-level rules that apply to every Copilot CLI session across repositories on your machine
 - `AGENTS.md`, and its sibling files like `CLAUDE.md` / `GEMINI.md` - for agent-level instructions that apply whenever the corresponding agent is active
 
 This layering is intentional as they all serve different purposes, but can also result in conflicting rules if not managed carefully. Copilot combines instructions when all sources are present but given the non-deterministic nature of language models, its choice of instruction mix might not always be predictable.
