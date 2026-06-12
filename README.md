@@ -46,7 +46,7 @@ Across the seven core modules of this course (plus a prerequisites section and a
 
 ## Course structure
 
-Each section is a single markdown file under [`content/`](./content/). Sections build on each other but each section's exercises include a starting-state note so you can drop in if you need to.
+Each module is a single markdown file under [`content/`](./content/). Modules build on each other but each module's exercises include a starting-state note so you can drop in if you need to.
 
 1. [Environment setup][s00]
 2. [Working with Copilot CLI][s01]
@@ -60,11 +60,25 @@ Each section is a single markdown file under [`content/`](./content/). Sections 
 
 ## Get started
 
-Head to [Section 0: Environment setup][s00] to get your environment ready.
+Head to [Module 0: Environment setup][s00] to get your environment ready.
+
+## Module 3 catch-up assets
+
+If you jump directly into Module 3, run the catch-up script from the AssetTrack repository root:
+
+```bash
+node scripts/catchup.mjs --source-repo-url https://github.com/GeekTrainer/advanced-copilot-cli --asset-path assets/03
+```
+
+```powershell
+node scripts/catchup.mjs --source-repo-url https://github.com/GeekTrainer/advanced-copilot-cli --asset-path assets/03
+```
+
+The script pulls from the [course source repository][course-source-repo] and copies the selected asset path into the AssetTrack repository root, excluding the `scripts/` directories. To test against a local checkout before the assets are merged upstream, pass `--source-path`. To reuse it for another module, pass that module's asset path, such as `--asset-path assets/04`.
 
 ## Status
 
-This repository contains the **skeleton** for the course. Each section README captures the structure, talking points, and exercise outlines. Full prose, screenshots, and step-by-step content will be filled in by the course authors.
+This repository contains the **skeleton** for the course. Each module file captures the structure, talking points, and exercise outlines. Full prose, screenshots, and step-by-step content will be filled in by the course authors.
 
 [legacy-app]: https://github.com/geektrainer/legacy-app
 [s00]: ./content/00-prerequisites.md
@@ -76,3 +90,4 @@ This repository contains the **skeleton** for the course. Each section README ca
 [s06]: ./content/06-modernize-apps.md
 [s07]: ./content/07-manage-infrastructure.md
 [s08]: ./content/08-wrap-up.md
+[course-source-repo]: https://github.com/GeekTrainer/advanced-copilot-cli

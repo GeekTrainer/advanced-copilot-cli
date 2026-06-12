@@ -1,0 +1,62 @@
+name: Bug report
+description: Report a reproducible problem in AssetTrack.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the commands, pages, API calls, or inputs that reproduce the problem.
+      placeholder: |
+        1. Start the app with `npm run dev`.
+        2. Open `http://localhost:4321`.
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for this bug to be considered fixed?
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Include logs, screenshots, test output, or error messages.
+    validations:
+      required: false
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Codespaces, devcontainer, local OS, browser, or service version.
+    validations:
+      required: true
