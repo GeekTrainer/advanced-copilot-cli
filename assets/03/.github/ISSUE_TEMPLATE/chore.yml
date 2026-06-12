@@ -1,0 +1,44 @@
+name: Chore
+description: Track maintenance work that is not a bug or feature.
+title: "chore: "
+labels:
+  - chore
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What maintenance work should be done?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Which files, services, or commands are in scope?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How will reviewers know this is complete?
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Codespaces, devcontainer, local OS, or service version.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation
+      description: Which commands should pass?
+    validations:
+      required: false

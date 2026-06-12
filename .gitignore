@@ -30,3 +30,12 @@ node_modules/
 # Module runner workspaces
 module-runs/
 issues/
+
+# Course assets must be checked in exactly as learners receive them, including
+# directories such as .github and .copilot.
+!assets/
+!assets/**
+!assets/**/.github/
+!assets/**/.github/**
+!assets/**/.copilot/
+!assets/**/.copilot/**
