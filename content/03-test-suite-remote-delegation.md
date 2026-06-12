@@ -31,7 +31,7 @@ By the end of this section you will be able to:
 
 AssetTrack already has a few backend smoke tests, but the UI has no browser coverage yet. That makes accessibility work hard to trust. You'll use Copilot CLI to scaffold a small Playwright suite, read the first failures carefully, and make only the changes the evidence supports. Once the local foundation is reviewable, you'll write a delegation brief and send the broader test backfill to Copilot cloud agent.
 
-![Diagram of the test-backed workflow: write tests, gather evidence, and only then change application code.](./images/03-test-backed-workflow.png)
+![Five connected stages running left to right: Accessibility, Tests, Remote, Delegate, and PR.](./images/03-test-backed-workflow.png)
 
 ## Local, remote, and delegated work
 
@@ -43,7 +43,7 @@ The same Copilot CLI logic can run in three places, and choosing the right one f
 
 As a rule, keep ambiguous work local and delegate only bounded work you can describe with files, commands, constraints, and PR expectations. Remember that the cloud agent sees pushed branches and repository files, not the uncommitted changes in your terminal — so commit and push before you delegate.
 
-![Diagram comparing local, remote, and delegated Copilot CLI work surfaces.](./images/03-copilot-work-surfaces.png)
+![Three work surfaces side by side: Local shown as a terminal window, Remote as a web page beside a phone, and Cloud as a robot inside a cloud.](./images/03-copilot-work-surfaces.png)
 
 ## Exercise 1: Start the Playwright foundation locally
 
@@ -51,7 +51,7 @@ In this exercise you'll create the first browser test signal for the AssetTrack 
 
 The goal is a tight evidence loop: scaffold tests, run them, classify each failure, and fix only what the evidence supports.
 
-![Diagram of the test evidence loop: run tests, classify each failure, fix the smallest thing, and re-run.](./images/03-test-evidence-loop.png)
+![A four-stage cycle flowing clockwise: Run, Learn, Fix, and Verify, then back to Run.](./images/03-test-evidence-loop.png)
 
 1. Open your AssetTrack repository in the course codespace or devcontainer. Confirm `git remote -v` points to your writable AssetTrack repository.
 2. Confirm dependencies are installed. The devcontainer usually runs `npm install && npm run install:all`; if package errors appear, run those commands yourself.
@@ -99,7 +99,7 @@ When you're done, `npx playwright test --list` discovers the browser tests under
 
 A few things can get in the way: the account or organization may have remote sessions disabled, the current folder may not be a GitHub repository, or the original machine may stop before the command finishes. The `/keep-alive busy` command can help prevent supported environments from idling during longer work; if your CLI version does not support it, keep the codespace or machine active using your instructor's environment guidance.
 
-![Diagram of steering an active Copilot CLI session from GitHub.com or GitHub Mobile via /remote.](./images/03-remote-control-flow.png)
+![A Copilot CLI terminal labeled /remote linked to a laptop showing GitHub.com and a phone showing GitHub Mobile, all driving the same session.](./images/03-remote-control-flow.png)
 
 ## Exercise 2: Steer the test session with `/remote`
 
@@ -126,7 +126,7 @@ When you're done, the remote UI shows the same conversation as the terminal sess
 
 A useful delegation task spells out the primary goal, secondary goals, the files and folders in scope, the files and folders out of scope, the commands to run, what to do if production behavior blocks the task, and the expected PR title and description. Before committing or pushing the local foundation, ask Copilot for `git status` and a diff summary — don't delegate from a dirty working tree unless you understand what the cloud agent can and cannot see. When the PR lands, treat the cloud agent like a teammate: review file scope, test evidence, production code changes, skipped tests, and known limitations before merging.
 
-![Diagram of the delegation handoff to Copilot cloud agent and the pull request it opens.](./images/03-delegation-handoff-flow.png)
+![A laptop with a brief document passing through /delegate to a cloud agent, which opens a pull request that a person reviews.](./images/03-delegation-handoff-flow.png)
 
 ## Exercise 3: Delegate the test backfill
 
