@@ -41,7 +41,7 @@ The same Copilot CLI logic can run in three places, and choosing the right one f
 - `/remote` gives GitHub.com or GitHub Mobile control over the same active CLI session running in your terminal or codespace. It does not move execution to a hosted runner.
 - `/delegate` sends scoped work to Copilot cloud agent, which works from GitHub state, creates commits, and opens a pull request.
 
-As a rule, keep ambiguous work local and delegate only bounded work you can describe with files, commands, constraints, and PR expectations. Remember that the cloud agent sees pushed branches and repository files, not the uncommitted changes in your terminal — so commit and push before you delegate.
+As a general rule, keep ambiguous work local and delegate only bounded work you can describe with files, commands, constraints, and PR expectations. Remember that the cloud agent sees pushed branches and repository files, not the uncommitted changes in your terminal — so commit and push before you delegate.
 
 ![Three work surfaces side by side: Local shown as a terminal window, Remote as a web page beside a phone, and Cloud as a robot inside a cloud.](./images/03-copilot-work-surfaces.png)
 
