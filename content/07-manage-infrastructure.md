@@ -1,9 +1,9 @@
-# Section 7 — Managing Copilot's infrastructure
+# Module 7 — Managing Copilot's infrastructure
 
 | [← Previous: Modernizing apps with Copilot CLI][previous-lesson] | [Next: Wrap-up →][next-lesson] |
 |:--|--:|
 
-Everything so far has been about one developer's workflow. This section is about scaling that to a team: enterprise-level custom agents, plugins for distribution, and a custom MCP server that exposes a shared resource — for AssetTrack, the database — to every Copilot CLI session in the org.
+Everything so far has been about one developer's workflow. This module is about scaling that to a team: enterprise-level custom agents, plugins for distribution, and a custom MCP server that exposes a shared resource — for AssetTrack, the database — to every Copilot CLI session in the org.
 
 ## What you will learn
 
@@ -15,9 +15,9 @@ Everything so far has been about one developer's workflow. This section is about
 ## Scenario
 
 > [!NOTE]
-> **Starting state**: the modernization work from [Section 6][s06] is committed; the AI infrastructure across [Sections 2–5][s02] is in place. This section **targets the learner's fork only**, but the patterns are intended for org-wide rollout.
+> **Starting state**: the modernization work from [Module 6][s06] is committed; the AI infrastructure across [Modules 2–5][s02] is in place. This module **targets the learner's fork only**, but the patterns are intended for org-wide rollout.
 
-The accessibility upgrade, the test backfill, the hooks, the barcode feature, and the modernization all worked because *you* had the right AI infrastructure on your machine. Your teammates don't. Section 7 fixes that — package the setup so the next person who joins gets the same loops, agents, skills, and MCP servers in one install.
+The accessibility upgrade, the test backfill, the hooks, the barcode feature, and the modernization all worked because *you* had the right AI infrastructure on your machine. Your teammates don't. Module 7 fixes that — package the setup so the next person who joins gets the same loops, agents, skills, and MCP servers in one install.
 
 ## Tech overview: Enterprise custom agents
 
@@ -60,7 +60,7 @@ Talking points:
 - **Files/areas touched**: a new MCP server project (own repo or a `mcp-servers/inventory-db/` folder), and the `mcp.json` (or equivalent) in the AssetTrack repo registering the server.
 - **Steps**:
   - Define the tools the server exposes: `list_assets`, `get_asset`, `list_assignments`, `find_assignments_older_than(days)`, etc. Write inputs / outputs.
-  - Implement the backing queries with parameterized SQL only (the rules from `repository.instructions.md` in [Section 2][s02] still apply).
+  - Implement the backing queries with parameterized SQL only (the rules from `repository.instructions.md` in [Module 2][s02] still apply).
   - Add an explicit allowlist for any write tool; default to read-only.
   - Register the server, run `/mcp` to confirm it's loaded, ask Copilot to call the new tools.
 - **How to verify**: `/mcp` lists the inventory-db server; a smoke prompt ("how many active assignments do we have?") goes through the MCP tool rather than shell SQL; write attempts on read-only tools are rejected.
@@ -99,7 +99,7 @@ You've now:
 - Packaged the full AssetTrack AI infrastructure as a plugin a teammate can install in one shot.
 - Closed the loop from individual workflow to team-wide capability.
 
-Wrap up the course in [Section 8][next-lesson].
+Wrap up the course in [Module 8][next-lesson].
 
 ## Resources
 

@@ -2,7 +2,7 @@
 name: module-runner
 description: |
   Simulate a learner running an advanced-copilot-cli course module end-to-end. Read a module from content/NN-*.md, execute every learner step in order on the machine where the skill runs, run every command and prompt individually, verify outcomes, and write findings to issues/NN-issues.md.
-  USE FOR: run a module, test a module, validate a course section, simulate a student, learner walkthrough, find module issues, run section steps.
+  USE FOR: run a module, test a module, validate a course module, simulate a student, learner walkthrough, find module issues, run module steps.
   DO NOT USE FOR: editing course content without running it, generic code review, running Azure agentic journeys, or static-only content review.
 ---
 
@@ -28,7 +28,7 @@ Static review alone is a failed run. If a step cannot be performed, record the r
 
 ## Module format in this repo
 
-Course modules live in `content/` and use numbered file names such as `content/03-test-suite-remote-delegation.md`. The H1 usually starts with a section title, exercises use `## Exercise: ...`, and learner substeps often use `### Phase ...` plus numbered lists. Code fences are meaningful:
+Course modules live in `content/` and use numbered file names such as `content/03-test-suite-remote-delegation.md`. The H1 usually starts with a module title, exercises use `## Exercise: ...`, and learner substeps often use `### Phase ...` plus numbered lists. Code fences are meaningful:
 
 - `bash` fences are shell commands the learner runs.
 - `text` fences often contain Copilot CLI prompts, slash commands, URLs, or expected output.
@@ -62,13 +62,13 @@ module-runs/<module-number>-<module-slug>-<timestamp>/
 
 Do not run learner commands from the course root unless the module explicitly says the learner should work in the course repository. The course root is for reading module content and writing the issue report.
 
-If the module names a target learner repository, such as the Section 3 instruction to open an AssetTrack repository created from the `GeekTrainer/legacy-app` template, clone or copy that repository into `learner-workspace/` and run the module there. Prefer a fresh clone or copy so the complete resulting state is preserved for review. If the target repository, repository URL, branch, or credentials are not available, stop before the first dependent learner step and record a missing-prerequisite or external-service blocker in the issue report.
+If the module names a target learner repository, such as the Module 3 instruction to open an AssetTrack repository created from the `GeekTrainer/legacy-app` template, clone or copy that repository into `learner-workspace/` and run the module there. Prefer a fresh clone or copy so the complete resulting state is preserved for review. If the target repository, repository URL, branch, or credentials are not available, stop before the first dependent learner step and record a missing-prerequisite or external-service blocker in the issue report.
 
 ### Chapter assets and catch-up setup
 
 Before running learner actions, check whether the course repository has chapter-specific assets under `assets/<module-number>/`. Read any `README.md` files there and decide whether the module depends on those assets for a jump-in learner path or prerequisite catch-up.
 
-If the module has catch-up assets that are required for a valid test run, apply them to the learner repository after the learner repository is cloned or copied and before dependency install, devcontainer setup, Copilot prompts, app startup, commits, pushes, or delegation. For example, Section 3 provides `assets/03/section-02-catchup/` to add the Section 2 AI infrastructure to a fresh AssetTrack repository.
+If the module has catch-up assets that are required for a valid test run, apply them to the learner repository after the learner repository is cloned or copied and before dependency install, devcontainer setup, Copilot prompts, app startup, commits, pushes, or delegation. For example, Module 3 provides `assets/03/section-02-catchup/` to add the Module 2 AI infrastructure to a fresh AssetTrack repository.
 
 When a catch-up folder provides scripts, run the appropriate script from the course repo host and pass the learner repository path explicitly:
 
@@ -86,7 +86,7 @@ Do not force overwrites unless the user explicitly approves. If the script refus
 
 ### GitHub template repository setup
 
-Some modules depend on a learner-owned repository created from a GitHub template, such as Section 0's AssetTrack repository created from `GeekTrainer/legacy-app`. If the user provides the upstream template repository, a wrong repository, or no writable learner repository, you may offer to create a temporary learner repository from the template with GitHub CLI.
+Some modules depend on a learner-owned repository created from a GitHub template, such as Module 0's AssetTrack repository created from `GeekTrainer/legacy-app`. If the user provides the upstream template repository, a wrong repository, or no writable learner repository, you may offer to create a temporary learner repository from the template with GitHub CLI.
 
 Template repository creation is an external GitHub side effect. Before running `gh repo create --template`, ask for explicit approval with the target owner, repository name, visibility, and cleanup expectation. Do not create, push to, delegate from, or delete a GitHub repository without explicit user approval.
 
@@ -251,5 +251,5 @@ Run module-runner for content/03-test-suite-remote-delegation.md.
 ```
 
 ```text
-Use module-runner to simulate a learner through Section 3 and write issues to issues/03-issues.md.
+Use module-runner to simulate a learner through Module 3 and write issues to issues/03-issues.md.
 ```

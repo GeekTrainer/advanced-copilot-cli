@@ -1,4 +1,4 @@
-# Section 4 — Shaping Copilot CLI's lifecycle with hooks
+# Module 4 — Shaping Copilot CLI's lifecycle with hooks
 
 | [← Previous: Enhancing the test suite with remote and delegation][previous-lesson] | [Next: Adding a new feature →][next-lesson] |
 |:--|--:|
@@ -15,7 +15,7 @@ Agents that move fast still need feedback loops. Hooks let you wire that feedbac
 ## Scenario
 
 > [!NOTE]
-> **Starting state**: instructions, custom agents, and the test scaffold from [Sections 2–3][s02] in place. Exercises **target the learner's fork only** and add config files; no production code changes.
+> **Starting state**: instructions, custom agents, and the test scaffold from [Modules 2–3][s02] in place. Exercises **target the learner's fork only** and add config files; no production code changes.
 
 Your test suite is growing. Right now Copilot runs the tests only when you remember to ask. Hooks fix that — every time the agent edits a file in a covered area, the right checks fire automatically and the agent sees the result on its next turn.
 
@@ -76,7 +76,7 @@ You've now:
 - Seen the after-edit feedback loop close automatically.
 - Internalized the distinction between work that belongs in a hook and work that doesn't.
 
-Next, you'll add a real **new feature** — barcode / QR support — and orchestrate it with `/plan`, rubber-duck critique, `/research`, and `/fleet` in [Section 5][next-lesson].
+Next, you'll add a real **new feature** — barcode / QR support — and orchestrate it with `/plan`, rubber-duck critique, `/research`, and `/fleet` in [Module 5][next-lesson].
 
 ## Resources
 

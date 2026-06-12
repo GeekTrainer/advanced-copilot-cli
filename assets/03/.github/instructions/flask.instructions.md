@@ -4,7 +4,7 @@ applyTo: "services/**/*.{py}"
 
 # Python service instructions
 
-AssetTrack's Python services live in `services/reporting-svc/` and `services/notifications-svc/`. They use FastAPI even though this instruction file keeps the Section 02 name `flask.instructions.md`.
+AssetTrack's Python services live in `services/reporting-svc/` and `services/notifications-svc/`. They use FastAPI even though this instruction file keeps the Module 02 name `flask.instructions.md`.
 
 ## Rules
 

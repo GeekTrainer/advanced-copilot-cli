@@ -1,9 +1,9 @@
-# Section 2 — Building an AI infrastructure foundation
+# Module 2 — Building an AI infrastructure foundation
 
 | [← Previous: Working with Copilot CLI][previous-lesson] | [Next: Enhancing the test suite with remote and delegation →][next-lesson] |
 |:--|--:|
 
-A productive Copilot CLI session starts with the agent already knowing the basics about your project — *and* with the right specialized helpers in reach. This section takes the documentation you produced in [Section 1][previous-lesson], codifies what Copilot needs to know as `copilot-instructions.md` (via `/init`) and path-scoped `.instructions` files, builds an accessibility-focused custom agent, and imports an agent skill so contribution hygiene (issues, branches, templated PRs) is automatic.
+A productive Copilot CLI session starts with the agent already knowing the basics about your project — *and* with the right specialized helpers in reach. This module takes the documentation you produced in [Module 1][previous-lesson], codifies what Copilot needs to know as `copilot-instructions.md` (via `/init`) and path-scoped `.instructions` files, builds an accessibility-focused custom agent, and imports an agent skill so contribution hygiene (issues, branches, templated PRs) is automatic.
 
 ## What you will learn
 
@@ -16,7 +16,7 @@ A productive Copilot CLI session starts with the agent already knowing the basic
 ## Scenario
 
 > [!NOTE]
-> **Starting state**: the documentation updates committed at the end of [Section 1][previous-lesson] are in place. **Implementation exercises** — you'll add instructions files, a custom agent, and import an agent skill, but won't change production code. Files added here are used by every later section.
+> **Starting state**: the documentation updates committed at the end of [Module 1][previous-lesson] are in place. **Implementation exercises** — you'll add instructions files, a custom agent, and import an agent skill, but won't change production code. Files added here are used by every later module.
 
 You've already used Copilot to fill the obvious documentation gaps in AssetTrack. That gives every future session a much better starting context. Now you'll codify the rules Copilot should follow — the stacks, the conventions, the do/don't rules — and add the custom agent and skill that enforce best practices for accessibility and contribution hygiene.
 
@@ -70,7 +70,7 @@ Talking points:
 - **Steps**:
   - Author the agent with: persona ("expert front-end accessibility engineer"), scope (Astro components, templates, and a11y test files only), tool allowlist (file read/write, shell limited to test runners), and the rules to follow (WCAG-aligned changes only, keep current functionality, no styling rewrites beyond what a11y requires).
   - Run `/agent` to confirm the agent is registered.
-  - Smoke-test by asking the agent to review one Astro page and propose changes — review the diff but don't apply yet (we'll exercise this agent further in [Section 5][s05]).
+  - Smoke-test by asking the agent to review one Astro page and propose changes — review the diff but don't apply yet (we'll exercise this agent further in [Module 5][s05]).
 - **How to verify**: `/agent` lists `accessibility-updater`; the smoke-test review names specific WCAG criteria and specific selectors.
 
 ## Tech overview: Agent skills and the `make-repo-contribution` pattern
@@ -108,11 +108,11 @@ You should now have:
 
 - A repo-baseline `.github/copilot-instructions.md` seeded by `/init` and refined by hand.
 - Scoped instructions for each of the four stacks.
-- An `accessibility-updater` custom agent ready for use in later sections.
+- An `accessibility-updater` custom agent ready for use in later modules.
 - Issue / PR templates plus the imported `make-repo-contribution` skill enforcing the contribution flow.
 - A clear understanding of where Copilot looks for instructions, and how Memory layers on top.
 
-Next, you'll close the loop on accessibility with **Playwright tests** and offload the broader test backfill via `/remote` and `/delegate` in [Section 3][next-lesson].
+Next, you'll close the loop on accessibility with **Playwright tests** and offload the broader test backfill via `/remote` and `/delegate` in [Module 3][next-lesson].
 
 ## Resources
 

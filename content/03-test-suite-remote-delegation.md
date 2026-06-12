@@ -1,14 +1,14 @@
-# Section 3 — Enhancing the test suite with remote and delegation
+# Module 3 — Enhancing the test suite with remote and delegation
 
 | [← Previous: Building an AI infrastructure foundation][previous-lesson] | [Next: Shaping Copilot CLI's lifecycle with hooks →][next-lesson] |
 |:--|--:|
 
-The accessibility and contribution infrastructure from [Section 2][s02] is useful only if the team can prove it keeps working. This section turns the first accessibility checks into a Playwright-backed feedback loop, uses `/remote` to steer the active CLI session remotely, and hands a bounded test backfill to Copilot cloud agent with `/delegate`.
+The accessibility and contribution infrastructure from [Module 2][s02] is useful only if the team can prove it keeps working. This module turns the first accessibility checks into a Playwright-backed feedback loop, uses `/remote` to steer the active CLI session remotely, and hands a bounded test backfill to Copilot cloud agent with `/delegate`.
 
 > [!NOTE]
-> **Starting state**: instructions, the `accessibility-updater` custom agent, and an incomplete test scaffold from [Sections 1–2][s02] are in place. Exercises **target the learner's fork only**.
+> **Starting state**: instructions, the `accessibility-updater` custom agent, and an incomplete test scaffold from [Modules 1–2][s02] are in place. Exercises **target the learner's fork only**.
 
-If you're jumping straight to this section without finishing the earlier ones, get your AssetTrack repository in place using the [course prerequisites][prerequisites], then run the catch-up script from the repository root to apply the Section 3 assets:
+If you're jumping straight to this module without finishing the earlier ones, get your AssetTrack repository in place using the [course prerequisites][prerequisites], then run the catch-up script from the repository root to apply the Module 3 assets:
 
 ```bash
 node scripts/catchup.mjs \
@@ -18,7 +18,7 @@ node scripts/catchup.mjs \
 
 ## What you will learn
 
-By the end of this section you will be able to:
+By the end of this module you will be able to:
 
 - Decide which test work belongs in a local Copilot CLI session and which work is safe to delegate.
 - Start a Playwright browser test suite for AssetTrack's web UI.
@@ -35,7 +35,7 @@ AssetTrack already has a few backend smoke tests, but the UI has no browser cove
 
 ## Local, remote, and delegated work
 
-The same Copilot CLI logic can run in three places, and choosing the right one for a given task is the core skill of this section. Each surface trades immediacy for reach.
+The same Copilot CLI logic can run in three places, and choosing the right one for a given task is the core skill of this module. Each surface trades immediacy for reach.
 
 - A local Copilot CLI session is best for exploration, test setup, debugging, and judgment calls. You approve tool calls, inspect diffs, and decide whether a failure is a test bug, an app gap, or an environment issue.
 - `/remote` gives GitHub.com or GitHub Mobile control over the same active CLI session running in your terminal or codespace. It does not move execution to a hosted runner.
@@ -47,7 +47,7 @@ As a rule, keep ambiguous work local and delegate only bounded work you can desc
 
 ## Exercise 1: Start the Playwright foundation locally
 
-In this exercise you'll create the first browser test signal for the AssetTrack UI and use it to validate the accessibility work from Section 2. You'll touch `playwright.config.ts`, `tests/playwright/accessibility.spec.ts`, and root `package.json` and lockfile updates — plus narrow Astro accessibility files only if the tests prove a real gap.
+In this exercise you'll create the first browser test signal for the AssetTrack UI and use it to validate the accessibility work from Module 2. You'll touch `playwright.config.ts`, `tests/playwright/accessibility.spec.ts`, and root `package.json` and lockfile updates — plus narrow Astro accessibility files only if the tests prove a real gap.
 
 The goal is a tight evidence loop: scaffold tests, run them, classify each failure, and fix only what the evidence supports.
 
@@ -88,7 +88,7 @@ The goal is a tight evidence loop: scaffold tests, run them, classify each failu
     Run the Playwright tests and summarize the result. If any tests fail, classify each failure as one of: test bug, app accessibility gap, or environment/startup issue. Include the command run, how many tests were found, the pass/fail count, each failure category, and the next action you recommend. Do not change production code yet.
     ```
 
-11. If the setup is broken, fix only `playwright.config.ts`, `tests/playwright/**`, and package files. If the failure proves a real accessibility gap, switch to the `accessibility-updater` agent from Section 2 and make the narrowest app fix. If Copilot does not automatically switch to the right agent, run `/agent`, select `accessibility-updater`, then send the prompt.
+11. If the setup is broken, fix only `playwright.config.ts`, `tests/playwright/**`, and package files. If the failure proves a real accessibility gap, switch to the `accessibility-updater` agent from Module 2 and make the narrowest app fix. If Copilot does not automatically switch to the right agent, run `/agent`, select `accessibility-updater`, then send the prompt.
 12. Review the diff before committing. The local result should be a Playwright foundation, a test result, and maybe a small accessibility fix backed by that result.
 
 When you're done, `npx playwright test --list` discovers the browser tests under `tests/playwright/`, `npm run test:e2e` runs against the configured web server, any production code change is traceable to a failing accessibility test, and generated folders such as `test-results/` and `playwright-report/` are cleaned or ignored before commit.
@@ -184,13 +184,13 @@ When you're done, the pushed branch contains the local Playwright foundation and
 You should now have:
 
 - A Playwright foundation for the AssetTrack UI.
-- A validation result for the Section 2 accessibility work.
+- A validation result for the Module 2 accessibility work.
 - Any narrow accessibility fix that was justified by a failing browser test.
 - A delegation brief at `docs/delegations/test-backfill.md`.
 - A pushed handoff branch and, when `/delegate` is available, a draft PR from Copilot cloud agent expanding the test suite.
 - A clearer sense of when to keep Copilot CLI work local, steer it remotely, or delegate it to cloud agent.
 
-Next, you'll use the test commands created here to shape Copilot CLI's lifecycle with hooks so tests, builds, and lint checks run automatically as Copilot edits the project in [Section 4][next-lesson].
+Next, you'll use the test commands created here to shape Copilot CLI's lifecycle with hooks so tests, builds, and lint checks run automatically as Copilot edits the project in [Module 4][next-lesson].
 
 ## Resources
 

@@ -34,7 +34,7 @@ You'll work the legacy app from [`geektrainer/legacy-app`][legacy-app] throughou
 
 ## What you'll learn
 
-Across the seven core modules of this course (plus a prerequisites section and a wrap-up) you will:
+Across the seven core modules of this course (plus a prerequisites module and a wrap-up) you will:
 
 - Understand what an AI agent is and how the Copilot CLI harness works under the hood, including how to control models, permissions, and modes — then use Copilot CLI to explore the repo and fill the obvious documentation gaps.
 - Build the AI infrastructure for a brownfield repo: generate `copilot-instructions.md` with `/init`, add path-scoped `.instructions` files, author a custom agent for accessibility, and import the `make-repo-contribution` skill so every Copilot contribution flows through issues and PRs.

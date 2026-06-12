@@ -1,9 +1,9 @@
-# Section 1 — Working with Copilot CLI
+# Module 1 — Working with Copilot CLI
 
 | [← Previous: Prerequisites and environment setup][previous-lesson] | [Next: Building an AI infrastructure →][next-lesson] |
 |:--|--:|
 
-As we begin exploring deeper concepts in Copilot CLI, it helps to know how things work internally. This section grounds you in the agent model, walks through what's happening under the hood when Copilot is "thinking," and gets you comfortable with the core mechanics — picking a model and granting permissions.
+As we begin exploring deeper concepts in Copilot CLI, it helps to know how things work internally. This module grounds you in the agent model, walks through what's happening under the hood when Copilot is "thinking," and gets you comfortable with the core mechanics — picking a model and granting permissions.
 
 ## What you will learn
 
@@ -20,7 +20,7 @@ You're a developer who recently joined Contoso Industries and inherited **AssetT
 
 ## Tech topics
 
-This section covers two foundational concepts:
+This module covers two foundational concepts:
 
 - **Understanding AI agents** — how requests are processed, what makes an agent different from a chat tool, and what context Copilot uses to ground its responses.
 - **Copilot CLI under the hood** — the harness, the tool surface, and the permission model.
@@ -70,7 +70,7 @@ Context is key throughout much of life, and when working with AI. While the more
 
 We always need to ensure Copilot is able to find the correct answers to these questions. Copilot is able to explore the project to find and follow existing patterns. But this approach can be inefficient on larger projects, especially when you may have portions of your codebase which don't follow the guidelines set forth by your team.
 
-This is where your AI infrastructure - your instructions files, agent skills, custom agents and MCP servers - helps guide Copilot by providing curated context it can use when generating responses. Between your prompt, your code, and your project's AI infrastructure, Copilot will have the understanding of how to work in your environment. You'll build out that infrastructure starting in [Section 2][next-lesson].
+This is where your AI infrastructure - your instructions files, agent skills, custom agents and MCP servers - helps guide Copilot by providing curated context it can use when generating responses. Between your prompt, your code, and your project's AI infrastructure, Copilot will have the understanding of how to work in your environment. You'll build out that infrastructure starting in [Module 2][next-lesson].
 
 ### Determine the user's intent
 
@@ -270,7 +270,7 @@ As with many (most?) applications, documentation is lacking in AssetTrack. There
 
 ## Summary
 
-Copilot CLI isn't a chat box bolted onto your terminal — it's an agent running in a loop, pulling in context from your prompt, your code, and your AI infrastructure, then picking tools to act on your behalf. In this section you saw that flow end-to-end: how a prompt is interpreted, where context comes from, what the harness exposes as tools, and how the permission model keeps you in control of what runs. You then put it to work by exploring AssetTrack, calling the GitHub MCP server, managing approvals, and shipping a real documentation update through a branch and pull request.
+Copilot CLI isn't a chat box bolted onto your terminal — it's an agent running in a loop, pulling in context from your prompt, your code, and your AI infrastructure, then picking tools to act on your behalf. In this module you saw that flow end-to-end: how a prompt is interpreted, where context comes from, what the harness exposes as tools, and how the permission model keeps you in control of what runs. You then put it to work by exploring AssetTrack, calling the GitHub MCP server, managing approvals, and shipping a real documentation update through a branch and pull request.
 
 In this lesson, you learned:
 
@@ -279,7 +279,7 @@ In this lesson, you learned:
 - how the Copilot CLI harness works under the hood.
 - the core mechanics you'll use every day.
 
-Next, you'll **build the AI infrastructure** — codify what you just documented as `copilot-instructions.md` and scoped `.instructions` files, then add a custom agent and an imported skill in [Section 2][next-lesson].
+Next, you'll **build the AI infrastructure** — codify what you just documented as `copilot-instructions.md` and scoped `.instructions` files, then add a custom agent and an imported skill in [Module 2][next-lesson].
 
 ## Resources
 
