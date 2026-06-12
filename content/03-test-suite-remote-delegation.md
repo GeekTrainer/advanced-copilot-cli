@@ -3,10 +3,10 @@
 | [← Previous: Building an AI infrastructure foundation][previous-lesson] | [Next: Shaping Copilot CLI's lifecycle with hooks →][next-lesson] |
 |:--|--:|
 
-The accessibility and contribution infrastructure from [Module 2][s02] is useful only if the team can prove it keeps working. This module turns the first accessibility checks into a Playwright-backed feedback loop, uses `/remote` to steer the active CLI session remotely, and hands a bounded test backfill to Copilot cloud agent with `/delegate`.
+The accessibility and contribution infrastructure from [Module 2][m02] is useful only if the team can prove it keeps working. This module turns the first accessibility checks into a Playwright-backed feedback loop, uses `/remote` to steer the active CLI session remotely, and hands a bounded test backfill to Copilot cloud agent with `/delegate`.
 
 > [!NOTE]
-> **Starting state**: instructions, the `accessibility-updater` custom agent, and an incomplete test scaffold from [Modules 1–2][s02] are in place. Exercises **target the learner's fork only**.
+> **Starting state**: instructions, the `accessibility-updater` custom agent, and an incomplete test scaffold from [Modules 1–2][m02] are in place. Exercises **target the learner's fork only**.
 
 If you're jumping straight to this module without finishing the earlier ones, get your AssetTrack repository in place using the [course prerequisites][prerequisites], then run the catch-up script from the repository root to apply the Module 3 assets:
 
@@ -208,7 +208,7 @@ Next, you'll use the test commands created here to shape Copilot CLI's lifecycle
 
 [previous-lesson]: ./02-building-ai-infrastructure.md
 [next-lesson]: ./04-lifecycle-hooks.md
-[s02]: ./02-building-ai-infrastructure.md
+[m02]: ./02-building-ai-infrastructure.md
 [prerequisites]: ./00-prerequisites.md
 [remote-docs]: https://docs.github.com/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely
 [delegate-docs]: https://docs.github.com/copilot/how-tos/copilot-cli/use-copilot-cli/delegate-tasks-to-cca

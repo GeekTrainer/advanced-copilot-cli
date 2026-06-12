@@ -15,7 +15,7 @@ Modernizing a brownfield app is a research problem before it's a coding problem 
 ## Scenario
 
 > [!NOTE]
-> **Starting state**: the AI infrastructure, custom agents, and feature work from [Modules 2–5][s02] are in place. This module adds **LSP and MCP configuration**, a **research report**, and then **production code changes** under a feature branch as the modernization is applied.
+> **Starting state**: the AI infrastructure, custom agents, and feature work from [Modules 2–5][m02] are in place. This module adds **LSP and MCP configuration**, a **research report**, and then **production code changes** under a feature branch as the modernization is applied.
 
 End-of-life pressure is mounting on AssetTrack's stack — older framework majors, deprecated runtimes, packages with no maintainers. Before doing the modernization, you need to know what the modern targets look like, what the migration paths are, and where the risk lives. Then you execute.
 
@@ -33,7 +33,7 @@ Talking points:
   - `typescript-language-server` for the Astro/TypeScript frontend (covers the React islands too).
   - `omnisharp` or the modern `csharp-language-server` for .NET.
   - `pyright` or `python-lsp-server` for the FastAPI services.
-- **MCP recap (depth in [Module 7][s07] for plugins)**:
+- **MCP recap (depth in [Module 7][m07] for plugins)**:
   - Built-in GitHub MCP ships out of the box.
   - Custom MCP servers via `/mcp`. Configuration is repo-checkable.
   - **MCP as a documentation surface**: a docs MCP (e.g., a Context7 server, a Microsoft Learn server, a project's own docs MCP) gives the agent first-party documentation as a tool, instead of relying on web search or stale training data.
@@ -90,7 +90,7 @@ Talking points:
 - **Per-stack migrators**: author a custom agent per stack you're upgrading (e.g., `java-migrator`, `astro-migrator`, `dotnet-migrator`, `flask-migrator`). Each has a tight scope (its stack only) and a small tool surface (file edits + that stack's build / test runners).
 - **Why per-stack agents help**: cross-stack changes get split into independently reviewable diffs. A failure in one stack doesn't block the others.
 - **Phasing the migration**: per the research report — baseline (dependency / runtime versions in CI), per-stack upgrades, cross-stack contract validation, cleanup.
-- **Validation between phases**: hooks from [Module 4][s04] run the relevant suites automatically; failures route back to the responsible migrator on its next turn.
+- **Validation between phases**: hooks from [Module 4][m04] run the relevant suites automatically; failures route back to the responsible migrator on its next turn.
 
 ## Exercise: Execute one stack's modernization with a custom migrator agent
 
@@ -103,7 +103,7 @@ Talking points:
   - Author the migrator agent with: persona, scope (the stack's source paths only), tool allowlist (file r/w, that stack's build / test runners), and rules (no cross-stack edits, file follow-up issues for anything out of scope).
   - Run the agent on the first migration phase from the report.
   - Let the after-edit hooks surface failures; let the agent iterate.
-  - Open a PR via `make-repo-contribution` (from [Module 2][s02]).
+  - Open a PR via `make-repo-contribution` (from [Module 2][m02]).
 - **How to verify**:
   - The chosen stack builds and tests against the new target.
   - The PR is scoped to one stack, with the issue / branch / template hygiene the skill enforces.
@@ -139,9 +139,9 @@ Next, you'll scale this work to the team — enterprise agents, plugins, and a c
 
 [previous-lesson]: ./05-add-feature-barcode.md
 [next-lesson]: ./07-manage-infrastructure.md
-[s02]: ./02-building-ai-infrastructure.md
-[s04]: ./04-lifecycle-hooks.md
-[s07]: ./07-manage-infrastructure.md
+[m02]: ./02-building-ai-infrastructure.md
+[m04]: ./04-lifecycle-hooks.md
+[m07]: ./07-manage-infrastructure.md
 [lsp-config]: https://github.com/github/copilot-cli#-configuring-lsp-servers
 [mcp-intro]: https://modelcontextprotocol.io/introduction
 [github-mcp-server]: https://github.com/github/github-mcp-server

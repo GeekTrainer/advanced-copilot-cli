@@ -15,7 +15,7 @@ Greenfield features in a brownfield app are where Copilot CLI earns its keep —
 ## Scenario
 
 > [!NOTE]
-> **Starting state**: hooks from [Module 4][s04] in place; instructions, custom agents, and tests from [Modules 2–3][s02] in place. Exercises **modify code across one or more stacks** of AssetTrack under a feature branch (e.g., `feat/barcode-support`).
+> **Starting state**: hooks from [Module 4][m04] in place; instructions, custom agents, and tests from [Modules 2–3][m02] in place. Exercises **modify code across one or more stacks** of AssetTrack under a feature branch (e.g., `feat/barcode-support`).
 
 AssetTrack needs barcode support. Each asset gets a unique QR code (or 1-D barcode, depending on what research recommends); operators can scan to look up an asset. The work touches the data model, the API, the UI, and the test suite. Exactly the kind of feature where unbounded prompting goes off the rails — so you'll research, plan, and parallelize instead.
 
@@ -127,8 +127,8 @@ Next, you'll plan and execute a **modernization** of AssetTrack using `/research
 
 [previous-lesson]: ./04-lifecycle-hooks.md
 [next-lesson]: ./06-modernize-apps.md
-[s02]: ./02-building-ai-infrastructure.md
-[s04]: ./04-lifecycle-hooks.md
+[m02]: ./02-building-ai-infrastructure.md
+[m04]: ./04-lifecycle-hooks.md
 [copilot-plan]: https://docs.github.com/copilot/how-tos/use-copilot-agents/use-copilot-cli
 [copilot-agents]: https://docs.github.com/copilot/concepts/agents/about-copilot-cli
 [wcag-quickref]: https://www.w3.org/WAI/WCAG22/quickref/

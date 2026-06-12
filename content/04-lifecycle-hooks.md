@@ -15,7 +15,7 @@ Agents that move fast still need feedback loops. Hooks let you wire that feedbac
 ## Scenario
 
 > [!NOTE]
-> **Starting state**: instructions, custom agents, and the test scaffold from [Modules 2–3][s02] in place. Exercises **target the learner's fork only** and add config files; no production code changes.
+> **Starting state**: instructions, custom agents, and the test scaffold from [Modules 2–3][m02] in place. Exercises **target the learner's fork only** and add config files; no production code changes.
 
 Your test suite is growing. Right now Copilot runs the tests only when you remember to ask. Hooks fix that — every time the agent edits a file in a covered area, the right checks fire automatically and the agent sees the result on its next turn.
 
@@ -90,6 +90,6 @@ Next, you'll add a real **new feature** — barcode / QR support — and orchest
 
 [previous-lesson]: ./03-test-suite-remote-delegation.md
 [next-lesson]: ./05-add-feature-barcode.md
-[s02]: ./02-building-ai-infrastructure.md
+[m02]: ./02-building-ai-infrastructure.md
 [copilot-cli-docs]: https://docs.github.com/copilot/how-tos/use-copilot-agents/use-copilot-cli
 [copilot-prompting]: https://docs.github.com/copilot/get-started/best-practices

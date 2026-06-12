@@ -70,7 +70,7 @@ Talking points:
 - **Steps**:
   - Author the agent with: persona ("expert front-end accessibility engineer"), scope (Astro components, templates, and a11y test files only), tool allowlist (file read/write, shell limited to test runners), and the rules to follow (WCAG-aligned changes only, keep current functionality, no styling rewrites beyond what a11y requires).
   - Run `/agent` to confirm the agent is registered.
-  - Smoke-test by asking the agent to review one Astro page and propose changes — review the diff but don't apply yet (we'll exercise this agent further in [Module 5][s05]).
+  - Smoke-test by asking the agent to review one Astro page and propose changes — review the diff but don't apply yet (we'll exercise this agent further in [Module 5][m05]).
 - **How to verify**: `/agent` lists `accessibility-updater`; the smoke-test review names specific WCAG criteria and specific selectors.
 
 ## Tech overview: Agent skills and the `make-repo-contribution` pattern
@@ -131,7 +131,7 @@ Next, you'll close the loop on accessibility with **Playwright tests** and offlo
 
 [previous-lesson]: ./01-working-with-copilot-cli.md
 [next-lesson]: ./03-test-suite-remote-delegation.md
-[s05]: ./05-add-feature-barcode.md
+[m05]: ./05-add-feature-barcode.md
 [copilot-instructions]: https://docs.github.com/copilot/how-tos/configure-custom-instructions/add-repository-instructions
 [agents-md]: https://agents.md
 [copilot-memory]: https://docs.github.com/copilot/concepts/agents/copilot-memory
