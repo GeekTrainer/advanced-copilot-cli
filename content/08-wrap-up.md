@@ -1,9 +1,9 @@
-# Section 8 — Wrap-up and next steps
+# Module 8 — Wrap-up and next steps
 
 | [← Previous: Managing Copilot's infrastructure][previous-lesson] |  |
 |:--|--:|
 
-You've worked Copilot CLI through a brownfield, multi-stack codebase, codified your team's conventions, built reusable skills and custom agents, wired up lifecycle hooks, registered LSP and MCP servers, modernized a stack, and packaged the whole setup as a plugin. This section is a quick recap and a pointer to where to go next.
+You've worked Copilot CLI through a brownfield, multi-stack codebase, codified your team's conventions, built reusable skills and custom agents, wired up lifecycle hooks, registered LSP and MCP servers, modernized a stack, and packaged the whole setup as a plugin. This module is a quick recap and a pointer to where to go next.
 
 ## What you will learn
 
@@ -15,13 +15,13 @@ You've worked Copilot CLI through a brownfield, multi-stack codebase, codified y
 
 Talking points:
 
-- **Working with Copilot CLI** ([Section 1][s01]) — the harness, agent loop, tool surface, permission model.
-- **Building AI infrastructure foundation** ([Section 2][s02]) — exploring a brownfield project, filling doc gaps, generating `copilot-instructions.md` with `/init`, scoped `.instructions` files, the `accessibility-updater` custom agent, and the imported `make-repo-contribution` skill.
-- **Enhancing the test suite with remote and delegation** ([Section 3][s03]) — Playwright tests locally, `/remote` against a hosted environment, `/delegate` to the Copilot cloud agent, reviewing the resulting PR.
-- **Shaping Copilot CLI's lifecycle with hooks** ([Section 4][s04]) — wiring lifecycle hooks so tests, lint, and build feedback flow back to the agent automatically.
-- **Adding a new feature** ([Section 5][s05]) — `/research` for the library choice, `/plan` + rubber-duck, QA + accessibility custom agents, `/fleet` for parallel execution.
-- **Modernizing apps with Copilot CLI** ([Section 6][s06]) — `/lsp` across stacks, MCP servers as documentation surfaces, `/research` for a citation-backed plan, per-stack migrator agents driving the upgrade.
-- **Managing Copilot's infrastructure** ([Section 7][s07]) — enterprise custom agents, plugins for distribution, and a custom MCP server exposing the inventory database safely.
+- **Working with Copilot CLI** ([Module 1][m01]) — the harness, agent loop, tool surface, permission model.
+- **Building AI infrastructure foundation** ([Module 2][m02]) — exploring a brownfield project, filling doc gaps, generating `copilot-instructions.md` with `/init`, scoped `.instructions` files, the `accessibility-updater` custom agent, and the imported `make-repo-contribution` skill.
+- **Enhancing the test suite with remote and delegation** ([Module 3][m03]) — Playwright tests locally, `/remote` against a hosted environment, `/delegate` to the Copilot cloud agent, reviewing the resulting PR.
+- **Shaping Copilot CLI's lifecycle with hooks** ([Module 4][m04]) — wiring lifecycle hooks so tests, lint, and build feedback flow back to the agent automatically.
+- **Adding a new feature** ([Module 5][m05]) — `/research` for the library choice, `/plan` + rubber-duck, QA + accessibility custom agents, `/fleet` for parallel execution.
+- **Modernizing apps with Copilot CLI** ([Module 6][m06]) — `/lsp` across stacks, MCP servers as documentation surfaces, `/research` for a citation-backed plan, per-stack migrator agents driving the upgrade.
+- **Managing Copilot's infrastructure** ([Module 7][m07]) — enterprise custom agents, plugins for distribution, and a custom MCP server exposing the inventory database safely.
 
 ## Generalizing beyond AssetTrack
 
@@ -63,13 +63,13 @@ Talking points:
 |:--|--:|
 
 [previous-lesson]: ./07-manage-infrastructure.md
-[s01]: ./01-working-with-copilot-cli.md
-[s02]: ./02-building-ai-infrastructure.md
-[s03]: ./03-test-suite-remote-delegation.md
-[s04]: ./04-lifecycle-hooks.md
-[s05]: ./05-add-feature-barcode.md
-[s06]: ./06-modernize-apps.md
-[s07]: ./07-manage-infrastructure.md
+[m01]: ./01-working-with-copilot-cli.md
+[m02]: ./02-building-ai-infrastructure.md
+[m03]: ./03-test-suite-remote-delegation.md
+[m04]: ./04-lifecycle-hooks.md
+[m05]: ./05-add-feature-barcode.md
+[m06]: ./06-modernize-apps.md
+[m07]: ./07-manage-infrastructure.md
 [copilot-cli-docs]: https://docs.github.com/copilot/how-tos/use-copilot-agents/use-copilot-cli
 [copilot-best-practices]: https://docs.github.com/copilot/get-started/best-practices
 [mcp-intro]: https://modelcontextprotocol.io/introduction
