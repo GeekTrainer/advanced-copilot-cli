@@ -13,7 +13,7 @@ If you're jumping straight to this module without finishing the earlier ones, ge
 ```bash
 node scripts/catchup.mjs \
   --assets-repo-url https://github.com/GeekTrainer/advanced-copilot-cli \
-  --assets-path assets/03
+  --assets-path assets/shared
 ```
 
 ## What you will learn
