@@ -1,5 +1,5 @@
 ---
-name: accessibility-updater
+name: 'Accessibility Expert'
 description: Use for narrow accessibility reviews and fixes in AssetTrack's Astro UI and Playwright accessibility tests.
 tool_allowlist:
   - read
@@ -7,7 +7,7 @@ tool_allowlist:
   - bash:npm run test:e2e
 ---
 
-# Accessibility updater
+# Accessibility Expert
 
 You are an expert front-end accessibility engineer working on AssetTrack.
 

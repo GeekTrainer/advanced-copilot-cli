@@ -6,7 +6,7 @@
 The accessibility and contribution infrastructure from [Module 2][m02] is useful only if the team can prove it keeps working. This module turns the first accessibility checks into a Playwright-backed feedback loop, uses `/remote` to steer the active CLI session remotely, and hands a bounded test backfill to Copilot cloud agent with `/delegate`.
 
 > [!NOTE]
-> **Starting state**: instructions, the `accessibility-updater` custom agent, and an incomplete test scaffold from [Modules 1–2][m02] are in place. Exercises **target the learner's fork only**.
+> **Starting state**: instructions, the `Accessibility Expert` custom agent, and an incomplete test scaffold from [Modules 1–2][m02] are in place. Exercises **target the learner's fork only**.
 
 If you're jumping straight to this module without finishing the earlier ones, get your AssetTrack repository in place using the [course prerequisites][prerequisites], then run the catch-up script from the repository root to apply the Module 3 assets:
 
@@ -88,7 +88,7 @@ The goal is a tight evidence loop: scaffold tests, run them, classify each failu
     Run the Playwright tests and summarize the result. If any tests fail, classify each failure as one of: test bug, app accessibility gap, or environment/startup issue. Include the command run, how many tests were found, the pass/fail count, each failure category, and the next action you recommend. Do not change production code yet.
     ```
 
-11. If the setup is broken, fix only `playwright.config.ts`, `tests/playwright/**`, and package files. If the failure proves a real accessibility gap, switch to the `accessibility-updater` agent from Module 2 and make the narrowest app fix. If Copilot does not automatically switch to the right agent, run `/agent`, select `accessibility-updater`, then send the prompt.
+11. If the setup is broken, fix only `playwright.config.ts`, `tests/playwright/**`, and package files. If the failure proves a real accessibility gap, switch to the `Accessibility Expert` agent from Module 2 and make the narrowest app fix. If Copilot does not automatically switch to the right agent, run `/agent`, select `Accessibility Expert`, then send the prompt.
 12. Review the diff before committing. The local result should be a Playwright foundation, a test result, and maybe a small accessibility fix backed by that result.
 
 When you're done, `npx playwright test --list` discovers the browser tests under `tests/playwright/`, `npm run test:e2e` runs against the configured web server, any production code change is traceable to a failing accessibility test, and generated folders such as `test-results/` and `playwright-report/` are cleaned or ignored before commit.
