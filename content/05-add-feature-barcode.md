@@ -5,33 +5,55 @@
 
 Adding a greenfield feature inside a brownfield app is a real test of an agentic workflow. It takes forethought: finding the services that already exist, scoping the change, making the updates, and making sure nothing else breaks. An open-ended prompt like "add barcode support" is exactly the kind of request that sends an agent wandering across services, inventing schema, and producing a diff no one can review.
 
-This module walks the path that avoids that — research, then plan, then build with a fleet of agents, then gate the result with a quality-assurance agent — using QR code support for AssetTrack as the forcing function for `/research`, `/plan` with a rubber-duck critique, `/fleet`, and custom agents.
+The antidote isn't a trick; it's a loop you run every time you work with an agent — research, spec and plan, build, QA, then iterate. This module walks that loop end to end, using QR code support for AssetTrack as the forcing function for `/research`, `/plan` with a rubber-duck critique, `/fleet`, and a QA custom agent you build yourself.
 
 > [!NOTE]
-> **Starting state**: instructions, custom agents (including the `Accessibility Expert` from [Module 2][m02]), and the tests from [Modules 2–3][m02] are in place, and the hooks from [Module 4][m04] are wired up. Exercises in this module **modify application code** in `assets-svc` and `web`, so work on a feature branch such as `feat/barcode-support`.
+> **Starting state**: instructions, custom agents (including the `Accessibility Expert` from [Module 2][m02]), and the tests from [Modules 2–3][m02] are in place, and the hooks from [Module 4][m04] are wired up. This module registers the Playwright MCP server and has you build a QA custom agent, then **modifies application code** in `assets-svc` and `web` — so work on a feature branch such as `feat/barcode-support`.
 
 ## What you will learn
 
+- The repeatable loop for working with an agent — research, spec and plan, build, QA, iterate — and how this module makes each step concrete.
+- How to build a custom QA agent from a spec, register the Playwright MCP server so it can drive the running app, and compose it with the `Accessibility Expert` from Module 2.
 - How to use `/research` to choose a library before committing to an approach, and how to treat the resulting report as evidence rather than as a decision.
 - How to use `/plan` and plan mode to produce a written, bounded plan before any code changes, and how a rubber-duck critique catches the gaps a first plan always hides.
 - How `/fleet` runs subagents in parallel: when that genuinely accelerates the work, when it backfires, and how to keep the combined diff reviewable.
-- What custom agents are, how they differ from instructions and skills, and how to compose them — running an imported quality-assurance agent as a gate that hands accessibility checks to the `Accessibility Expert` from Module 2.
 
 ## Scenario
 
 AssetTrack tracks physical hardware — laptops, monitors, phones, badges — and every asset already carries a unique asset tag such as `CON-LPT-001`. Operators today read those tags by eye and type them in. Contoso wants each asset to carry a scannable QR code so that, in a later phase, an operator can point a phone at an asset and pull up its record. In this module you'll find a library to generate those codes, plan the updates it requires, and add generation to the application — leaving the scanning phase for later.
 
-## Choosing a barcode library with `/research`
+## The agentic loop
 
-Taking on a new library dependency is not something to improvise. These choices carry consequences that outlive the afternoon you spend on them: the license has to be compatible with the project, the library has to be actively maintained, and — the trap that catches most teams — it must not drag in native dependencies that break inside the production environment. A library that renders by leaning on the host operating system's graphics stack will pass on your laptop and fail in the deployed container. This is precisely the kind of question `/research` exists to answer.
+Whether you're fixing a bug or adding a feature that spans several services, the a standard approach without AI is:
 
-A good research prompt names the decision and its constraints rather than asking for a favorite. It states the use case (generate a QR image for an asset, server-side, in the .NET `assets-svc`), the runtime reality (the service runs in a Linux container, so no native graphics dependencies), and the decision criteria (a permissive license, active maintenance, a pure-managed rendering path). A weak prompt — "what's the best QR library?" — gives the agent nothing to optimize against, and the report drifts toward generic popularity rankings.
+1. **Research** — understand the problem and the realistic options before committing to an approach.
+2. **Spec and plan** — turn that understanding into a written, bounded plan you could hand to someone else.
+3. **Build** — implement the plan, ideally in independent slices that can move in parallel.
+4. **QA** — prove the result against the plan: it runs, it's tested, it's reviewed, it's accessible.
+5. **Iterate** — feed what QA finds back into the work until the gate passes.
 
-Treat the report the way you'd read a colleague's recommendation: check that the cited sources are real and current, that it names a specific library and version, and that the integration sketch points at the actual service. The report is evidence for a decision you make, not the decision itself.
+The steps don't change when introducing AI agents. If anything, it becomes more important. Spending the time up front to determine what needs to be done, then following it with validation that everything was done correctly, is key to success.
 
-## Exercise 1: Use `/research` to choose a QR library
+> [!NOTE]
+> For our exercise, we're going to start by building out our QA custom agent. Then you'll use it at the end of the module to validate the work done to add the required feature.
 
-In this exercise you'll use `/research` to determine which library fits best for server-side QR generation in `assets-svc`, with the Linux-container constraint front and center. You'll review the report, and save it locally so it becomes an asset in the repository. This will aid future code generation and other developers on your team, as it will explain what was selected and why it was selected.
+## Build the quality gate first
+
+You met custom agents in [Module 2][m02], where you imported the `Accessibility Expert` from a community catalog. Here you'll go the other way and build one to a precise spec, because the checks you want are specific to this feature and this app. A custom agent is a configured persona of Copilot — a name, a description, a restricted toolset, and instructions — that runs in its own isolated context and is invoked deliberately with `/agent`.
+
+The QA agent needs to do five things:
+
+1. read the spec and review the research to determine what needed to be done, 
+2. explore the running app to confirm the new functionality actually exists, 
+3. run the tests, 
+4. review the code on the branch, 
+5. confirm the new UI is accessible.
+
+Two of those need help from outside the agent's own reasoning. Exploring the running app means controlling a real browser, which the agent can't do on its own — so you'll give it the **Playwright MCP server**, a tool surface that lets Copilot click through and read pages in a live browser. (MCP servers extend what Copilot can do; [Module 6][next-lesson] goes deeper, but you only need this one here.) And the accessibility check already has an owner — the `Accessibility Expert` agent from Module 2 — so rather than re-teach that knowledge, the QA agent hands the new UI to it and treats a failed confirmation as a finding like any other.
+
+## Exercise 1: Build a QA agent
+
+In this exercise you'll register the Playwright MCP server and create a `QA` custom agent whose instructions encode the five checks above. The agent has nothing to inspect yet — that's the point. You're defining the finish line before the race starts; it does its real work in the final exercise, once research, planning, and the build have given it something to gate.
 
 > [!NOTE]
 > You'll start Copilot CLI with `--yolo`, which auto-approves every edit, command, and tool call so the work doesn't stop for permission on each step — useful once the `/fleet` build is running. That's appropriate here because a codespace is the kind of sandboxed, disposable container that [Module 1][m01] called out as the right home for YOLO mode. Treat it as the exception: on your own machine, or anywhere near real credentials or unreviewed code, start Copilot with plain `copilot` and approve actions deliberately.
@@ -45,7 +67,43 @@ In this exercise you'll use `/research` to determine which library fits best for
     copilot --yolo
     ```
 
-5. Run `/research` with a prompt that names the use case, the runtime constraint, and the decision criteria:
+5. Register the Playwright MCP server so the QA agent can drive a real browser. Add it using the standard server definition below, then run `/mcp` to confirm it's connected:
+
+    ```json
+    {
+      "mcpServers": {
+        "playwright": {
+          "command": "npx",
+          "args": ["@playwright/mcp@latest"]
+        }
+      }
+    }
+    ```
+
+6. Ask Copilot to create the QA agent definition. Describe the five responsibilities and let it write the file:
+
+    ```text
+    Create a custom agent at .github/agents/qa.agent.md named "Quality assurance" that acts as a quality gate for a feature branch. Give it permissions to read and shell access, the Playwright MCP server, and the ability to invoke other agents. Its instructions should have it, in order: (1) read the feature's research report and plan; (2) use the Playwright MCP server to open the running app and confirm the new functionality actually exists in the UI; (3) run the project's test suites and report the results; (4) review the code changes on the current branch against the plan; and (5) hand any new or changed UI to the Accessibility Expert agent to confirm accessibility, treating a failed confirmation as a finding. It should finish by reporting what it covered, what it couldn't verify, and every gap it found.
+    ```
+
+7. Open `.github/agents/qa.agent.md` and review what Copilot wrote. Confirm the five steps are present and in order, that the toolset includes the Playwright MCP server and the ability to call another agent, and tighten any instruction that reads as vague.
+8. Reset to a clean conversation with `/new` so Copilot picks up the new agent, then confirm with `/agent`. You should see `QA` in the list. Exit the agent menu with `Esc`.
+
+When you're done, `.github/agents/qa.agent.md` defines a `QA` agent that lists in `/agent`, encodes the five checks in order, and is wired to both the Playwright MCP server and the `Accessibility Expert`. It has nothing to gate yet — you'll point it at the finished feature in the last exercise.
+
+## Choosing a barcode library with `/research`
+
+Taking on a new library dependency is not something to improvise. These choices carry consequences that outlive the afternoon you spend on them: the license has to be compatible with the project, the library has to be actively maintained, and — the trap that catches most teams — it must not drag in native dependencies that break inside the production environment. A library that renders by leaning on the host operating system's graphics stack will pass on your laptop and fail in the deployed container. This is precisely the kind of question `/research` exists to answer.
+
+A good research prompt names the decision and its constraints rather than asking for a favorite. It states the use case (generate a QR image for an asset, server-side, in the .NET `assets-svc`), the runtime reality (the service runs in a Linux container, so no native graphics dependencies), and the decision criteria (a permissive license, active maintenance, a pure-managed rendering path). A weak prompt — "what's the best QR library?" — gives the agent nothing to optimize against, and the report drifts toward generic popularity rankings.
+
+Treat the report the way you'd read a colleague's recommendation: check that the cited sources are real and current, that it names a specific library and version, and that the integration sketch points at the actual service. The report is evidence for a decision you make, not the decision itself.
+
+## Exercise 2: Use `/research` to choose a QR library
+
+In this exercise you'll use `/research` to determine which library fits best for server-side QR generation in `assets-svc`, with the Linux-container constraint front and center. You'll review the report, and save it locally so it becomes an asset in the repository. This will aid future code generation and other developers on your team, as it will explain what was selected and why it was selected.
+
+1. In the same Copilot CLI session, run `/research` with a prompt that names the use case, the runtime constraint, and the decision criteria:
 
     ```text
     /research Research a QR code generation library for AssetTrack's assets service (services/assets-svc, .NET 8). I need to generate a QR code image for an asset on the server. The service runs in a Linux container, so the library must not depend on native OS graphics such as System.Drawing. Compare the realistic options and recommend one. For each option, report the license, a maintenance signal (last release and activity), whether rendering is pure-managed, and the output formats it supports (PNG and SVG). End with a recommendation and a short integration sketch for services/assets-svc. Cite your sources.
@@ -54,19 +112,19 @@ In this exercise you'll use `/research` to determine which library fits best for
 > [!NOTE]
 > The research will take several minutes as it searches the internet and considers options.
 
-6. Once the report is generated, ask Copilot to save the report to a folder named `reports` and a file named `qr-code-research.md` by using the following prompt:
+2. Once the report is generated, ask Copilot to save the report to a folder named `reports` and a file named `qr-code-research.md` by using the following prompt:
 
     ```
     Save the report to reports/qr-code-research.md
     ```
 
-7. In your codespace, open the file `reports/qr-code-research.md`. Review the report, reading through the information Copilot collected. The exact libraries it will return will vary, but you may see the following:
+3. In your codespace, open the file `reports/qr-code-research.md`. Review the report, reading through the information Copilot collected. The exact libraries it will return will vary, but you may see the following:
 
     - Net.Codecrete.QrCodeGenerator
     - QRCoder
     - ZXing.Net
 
-8. Based on the information provided, select the library you think works best. In the prompt examples below, we'll use `Net.Codecrete.QrCodeGenerator`, but if there's a different one you like you're free to use it!
+4. Based on the information provided, select the library you think works best. In the prompt examples below, we'll use `Net.Codecrete.QrCodeGenerator`, but if there's a different one you like you're free to use it!
 
 You now have a full report with the various options available to you, comparisons between them, that's now an asset that can be reviewed in the future.
 
@@ -78,7 +136,7 @@ The plan for QR support has more substance than "generate an image," because the
 
 The most valuable part of this stage is the critique. A first plan always reads as complete and almost always hides a gap, and rubber-ducking it — asking Copilot to argue against its own plan, ideally with a different model — is how that gap surfaces before it becomes a bug. Here the gap is specific: the QR payload is a deep-link URL that needs the asset's id, but the id doesn't exist until after the row is inserted. A plan that says "generate the payload on insert" is subtly wrong, and the fix — populate on write and backfill the rows that already exist — is exactly the kind of thing a critique catches.
 
-## Exercise 2: Plan the feature with `/plan` and a rubber-duck critique
+## Exercise 3: Plan the feature with `/plan` and a rubber-duck critique
 
 In this exercise you'll turn the library choice into a bounded, multi-wave plan and commit it as `docs/plans/qr-support.md` — still with no application code changed. The plan is finished when a teammate handed it would produce the same diff you would.
 
@@ -123,7 +181,7 @@ The QR plan is a good fit because its waves were drawn along those lines. The sc
 
 This is also where the discipline of the earlier stages pays off. The reason these slices can run in parallel without stepping on each other is that the research settled the library and the plan drew clean seams. `/fleet` is fast here not because parallelism is inherently fast, but because the work was shaped to be parallelizable.
 
-## Exercise 3: Build the waves in parallel with `/fleet`
+## Exercise 4: Build the waves in parallel with `/fleet`
 
 In this exercise you'll implement the plan with `/fleet`. Copilot will look at the plan and what needs to be done, then divide the work appropriately.
 
@@ -145,55 +203,48 @@ Copilot will get to work implementing the feature!
 
 When you're done, the feature is built and compiles: an asset has a stored `qr_payload`, existing assets were backfilled, `GET /assets/{id}/qr` returns an image, and the asset detail page renders the QR card — each wave arriving as its own reviewable diff. What you don't yet have is anyone vouching for it. That's the next stage.
 
-## Gating quality with a QA custom agent
+## Running the gate with your QA agent
 
-Parallel speed has a cost: several subagents each moved fast on their own slice, and no single pass has looked at the whole result with testing in mind. That's the job for a quality gate — and a custom agent is how you make that gate dependable rather than something you remember to do on a good day.
+Parallel speed has a cost: several subagents each moved fast on their own slice, and no single pass has looked at the whole result with testing in mind. That's the QA step of the loop, and the agent you built in Exercise 1 is what performs it. Point it at the branch and it works through its five checks: it reads the research and plan, drives the running app through the Playwright MCP server to confirm the QR code actually appears, runs the tests, reviews the diff against the plan, and hands the new asset detail UI to the `Accessibility Expert` for a verdict.
 
-You met custom agents in Module 2. A custom agent is a configured persona of Copilot — a name, a description, an optional restricted toolset, and instructions that shape how it behaves on its slice of the work. It's a different mechanism from the other infrastructure already in place. Instructions describe what's true about the codebase and apply passively to every session. Skills are deterministic capabilities the agent can call. A custom agent is a persona with a scope and a toolset, invoked deliberately when its kind of work comes up, running in its own isolated context so its back-and-forth never clutters the main session. Rather than write one from scratch, you'll import a quality-assurance agent from Awesome GitHub Copilot — the same move you made for the `Accessibility Expert` in Module 2.
+Whatever it surfaces is the start of the fifth step — iterate. A gate is only useful if you act on it: you fold its findings back into the code and run it again, until the feature clears it. One agent owns "is the promised behavior covered and working," and it delegates "is the new surface accessible" to the agent that already owns that question.
 
-A quality gate shouldn't try to be an expert in everything it checks, though. The new UI has to meet the same accessibility standard as the rest of AssetTrack — but that standard already lives in the `Accessibility Expert` agent you built in Module 2, which knows the project's WCAG target and its Astro and React conventions. Rather than copy that knowledge into the QA agent, you compose the two: you add a rule to the QA agent that hands the new UI to the `Accessibility Expert` to confirm accessibility, and treats a failed confirmation as a gap like any other. One agent owns "is the promised behavior covered," and it delegates "is the new surface accessible" to the agent that already owns that question.
+## Exercise 5: Run the QA agent you built
 
-## Exercise 4: Import a QA agent and compose it with the Accessibility Expert
+In this exercise you'll run the `QA` agent over the `/fleet` build, then iterate on what it finds. The agent will drive the running app, so make sure AssetTrack is up — `npm run dev`, with the UI reachable at `http://localhost:4321` — in the terminal where you've kept the app running.
 
-In this exercise you'll import the `QA` agent from Awesome GitHub Copilot, add a rule so it confirms accessibility through the `Accessibility Expert` agent from Module 2, and run it as the gate over the `/fleet` build. You'll add one file, `.github/agents/qa-subagent.agent.md`, and let the agent add tests.
+> [!NOTE]
+> Custom agents start with a fresh context. This means they'll only have the information you pass to it or they discover on their own. That can be advantageous in many scenarios, including performing a review. Having a QA agent do its review knowing the approach that was taken could lead to it taking shortcuts, assuming work was completed that wasn't actually done. By starting from scratch, only knowing what was supposed to be done, means it will naively explore, ask questions, and report back anything that doesn't align with the original goals.
 
-1. Browse the [Awesome GitHub Copilot][awesome-copilot] website and search for "qa".
-2. Select the **Agent** filter and find the `QA` subagent — its definition file is `qa-subagent.agent.md`. Click on it.
-3. Click **Render** to review the definition, confirm it can read, edit, and execute code (so it can write and run tests), then click **Copy**.
-4. Create a new file — `.github/agents/qa-subagent.agent.md` — and paste the copied content into it.
-5. Reset to a clean conversation with `/new` so Copilot picks up the new agent, then confirm with `/agent`. You should see `QA` in the list. Exit the agent menu with `Esc`.
-6. Add the accessibility-delegation rule to the agent. Ask Copilot to edit the definition so the gate composes with the specialist:
+1. Switch to the agent with `/agent`, select `QA`, then run it over the branch:
 
     ```text
-    Edit .github/agents/qa-subagent.agent.md to add a rule: whenever the change under test includes UI, hand the affected pages to the Accessibility Expert agent to confirm accessibility against the repository's standards, and treat a failed accessibility confirmation as a finding like any other bug. Keep the rest of the agent's behavior intact.
+    Review the QR code feature on this branch against reports/qr-code-research.md and the plan you created. Work through your full checklist: confirm the QR code renders in the running app, run the tests, review the diff, and confirm the new asset detail UI with the Accessibility Expert. Report what you covered, anything you couldn't verify, and every gap you found.
     ```
 
-7. Switch to the agent with `/agent`, select `QA`, then run it over the integrated build:
+2. Watch the agent work through its checks. It should open the app in a browser through the Playwright MCP server to confirm the QR code is really there, run the test suites, review the changes, and delegate the UI accessibility check to the `Accessibility Expert`.
+3. Iterate on the findings. For each gap the agent reports, ask Copilot to fix it, then run the `QA` agent again. Repeat until the gate comes back clean.
+4. Commit the feature, along with any tests the gate added, once it passes.
 
-    ```text
-    Review the QR code feature on this branch against docs/plans/qr-support.md. For every behavior the plan named, add a test using the project's existing test conventions and run it. The change includes UI on the asset detail page, so confirm its accessibility through the Accessibility Expert. Report what you covered, anything you couldn't test, and any accessibility findings.
-    ```
-
-8. Review what the agent produced: the tests it added, the results it ran, and the `Accessibility Expert`'s confirmation on the new UI. Address or log any gap it surfaced, then commit the tests.
-
-When you're done, `/agent` lists the `QA` agent, its definition carries the accessibility-delegation rule, and running it has turned the fast parallel build into a feature with tests for the behaviors the plan promised and an accessibility sign-off on the new asset detail UI — with any remaining gaps reported rather than silently skipped.
+When you're done, the `QA` agent has confirmed the QR code renders in the running app, the tests pass, the diff matches the plan, and the new asset detail UI carries an accessibility sign-off — with every gap it found either fixed or recorded rather than silently skipped.
 
 ## Summary
 
-QR support is a small feature, but it's a real one: it changes the database, adds an API endpoint and a dependency, threads a field through to the UI, and carries tests across every layer it touches. Walking it end to end, you:
+QR support is a small feature, but it's a real one: it changes the database, adds an API endpoint and a dependency, threads a field through to the UI, and carries tests across every layer it touches. Walking the loop end to end, you:
 
+- Built a `QA` custom agent first — your definition of "done" — wired to the Playwright MCP server and composed with the `Accessibility Expert` from Module 2.
 - Used `/research` to choose a QR library you can defend, with the container constraint front and center and citations to back the choice.
 - Used `/plan` and a rubber-duck critique to turn that choice into a bounded, multi-wave plan — and caught the deep-link backfill problem before it became a bug.
 - Used `/fleet` to build the independent waves in parallel, then integrated a set of independently reviewable diffs.
-- Imported a quality-assurance agent, composed it with the `Accessibility Expert` from Module 2, and ran it as a gate.
+- Ran the QA agent as the gate, then iterated on its findings until the feature passed.
 
-The throughline is that each stage feeds the next: research and planning make the parallel build safe, and a dedicated quality gate at the end catches what speed alone would miss. Next, you'll apply the same research-and-plan instincts to a larger problem — modernizing AssetTrack's older services — with `/research`, `/lsp`, MCP servers, and per-stack migrator agents in [Module 6][next-lesson].
+The throughline is the loop itself: research and planning make the parallel build safe, and a quality gate you defined up front catches what speed alone would miss. Next, you'll apply the same research-and-plan instincts to a larger problem — modernizing AssetTrack's older services — with `/research`, `/lsp`, MCP servers, and per-stack migrator agents in [Module 6][next-lesson].
 
 ## Resources
 
 - [Plan mode in Copilot CLI][copilot-plan]
 - [About custom agents in Copilot CLI][copilot-agents]
-- [Awesome GitHub Copilot — community-curated Copilot customizations][awesome-copilot]
+- [Playwright MCP server][playwright-mcp]
 
 ---
 
@@ -207,4 +258,4 @@ The throughline is that each stage feeds the next: research and planning make th
 [m04]: ./04-lifecycle-hooks.md
 [copilot-plan]: https://docs.github.com/copilot/how-tos/use-copilot-agents/use-copilot-cli
 [copilot-agents]: https://docs.github.com/copilot/concepts/agents/about-copilot-cli
-[awesome-copilot]: https://awesome-copilot.github.com/
+[playwright-mcp]: https://github.com/microsoft/playwright-mcp
