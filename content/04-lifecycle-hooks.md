@@ -27,7 +27,7 @@ At the end of [Module 3][previous-lesson] you delegated the test backfill to the
 
 A hook is a JSON-declared shell command, HTTP call or prompt that the Copilot CLI harness invokes synchronously at a named point in the agent loop. Hooks run **outside the AI model** - they are not prompts and the model does not decide when or whether they fire. The harness fires them unconditionally when a trigger event occurs, collects their stdout and injects it back into the agent's context before the next turn.
 
-Your instructions tell the model how to behave, while your hooks enforce behaviour regardless of what the model does. This distinction matters. A `postToolUse` hook that runs `pytest` after every Python file edit is not a suggestion - it runs every single time.
+Your instructions tell the model how to behave, while your hooks enforce behavior regardless of what the model does. This distinction matters. A `postToolUse` hook that runs `pytest` after every Python file edit is not a suggestion - it runs every single time.
 
 Consider hooks for checks that are:
 
@@ -40,9 +40,7 @@ Consider hooks for checks that are:
 Each hook entry declares a `type` field which can either be:
 
 - `command` - runs a shell command locally. Provide `bash` and optionally `powershell` for cross-platform support. This is the most common type.
-- `http` - POSTs the event payload as JSON to a URL. Useful for audit trails, webhook-triggered CI or external governance systems without a local script. 
-
-  HTTPS is required, but you can allow HTTP for localhost by setting `COPILOT_HOOK_ALLOW_LOCALHOST=1`.
+- `http` - POSTs the event payload as JSON to a URL. Useful for audit trails, webhook-triggered CI or external governance systems without a local script. HTTPS is required by default, but you can allow HTTP for localhost by setting `COPILOT_HOOK_ALLOW_LOCALHOST=1`.
 - `prompt` - auto-submits a text string or slash command into the session on `sessionStart`. Only fires on new interactive sessions (not on resume or in non-interactive `-p` mode).
 
 ### How hooks receive events and return output
@@ -108,7 +106,6 @@ For `agentStop`, the output schema is different:
 
 A `"block"` decision tells the harness to open another agent turn automatically, with `reason` as the injected prompt. This is how you will implement *"if tests are red, the agent must address them before it can stop."*
 
-
 Exit codes are how a command hook communicates its own health back to the harness, separate from the JSON it writes to stdout. Every command hook produces an exit code, and the harness uses it to decide whether to treat the hook as successful, warn or fail, before it ever looks at the hook's output.
 
 | Exit code | Meaning |
@@ -118,7 +115,6 @@ Exit codes are how a command hook communicates its own health back to the harnes
 | Other non-zero | Hook failure logged, run continues (fail-open) |
 
 Most hook failures are **fail-open** - a crash, timeout or non-zero exit is logged and the agent continues. `preToolUse` is the deliberate exception. Because it sits in front of every tool call as a security gate, a command hook that crashes, times out or exits non-zero (other than exit 2) **denies the tool call.** Here, the harness refuses to let a broken guard silently become no guard at all. 
-
 
 > [!NOTE]
 > HTTP `preToolUse` hooks behave differently. If the request fails, either due to network error, timeout or non-2xx, the harness treats the hook as if it never ran and the normal permission flow decides instead. 
@@ -147,10 +143,7 @@ Hooks are declared in JSON files and require no explicit registration step. All 
 The harness loads hooks from four sources, in order. Hooks from all sources for the same event are **merged** (not overwritten):
 
 1. **Policy hooks:** Machine-wide hooks installed by enterprise IT administrators. They load before everything else, cannot be disabled by `disableAllHooks` and end users cannot modify or override them.
-2. **User hooks:** `~/.copilot/hooks/*.json` (or `%USERPROFILE%\.copilot\hooks\` on Windows). Personal hooks stored on your local machine, not version-controlled and not shared with teammates. 
-
-    Ideal for desktop notifications, personal audit logging or any preference you don't want to impose on the team.
-
+2. **User hooks:** `~/.copilot/hooks/*.json` (or `%USERPROFILE%\.copilot\hooks\` on Windows). Personal hooks stored on your local machine, not version-controlled and not shared with teammates. This is ideal for desktop notifications, personal audit logging or any preference you don't want to impose on the team.
 3. **Repository hooks:** `.github/hooks/*.json`. Checked into source control so every team member gets them automatically on clone. This is also the **only** source the cloud agent loads since user files and plugins do not exist in the cloud sandbox.
 4. **Plugin hooks:** Declared inside each installed Copilot CLI plugin's own directory and loaded automatically alongside other sources when a plugin is installed.
 
@@ -404,7 +397,7 @@ With hooks wired up, prove the loop end-to-end: a change goes in, the `postToolU
     What did the test run report?
     ```
 
-    The agent should be able to quote or summarise the test output from the `additionalContext` the hook injected.
+    The agent should be able to quote or summarize the test output from the `additionalContext` the hook injected.
 
 4. Now deliberately break the assertion to trigger the `agentStop` gate. Ask Copilot to introduce a broken test:
 
@@ -428,7 +421,7 @@ With hooks wired up, prove the loop end-to-end: a change goes in, the `postToolU
 
 You've now:
 
-- Understood hooks as the deterministic enforcement layer underneath the probabilistic model layer - they run unconditionally, feed structured output back via stdin/stdout JSON contracts and can block or modify agent actions.
+- Explored hooks as the deterministic enforcement layer underneath the probabilistic model layer - they run unconditionally, feed structured output back via stdin/stdout JSON contracts and can block or modify agent actions.
 - Authored a `postToolUse` hook scoped to file edits that dispatches to the right test runner per stack and injects results as `additionalContext`.
 - Wired an `agentStop` gate that blocks the agent from finishing a turn while tests are red and forces a self-correction loop.
 
