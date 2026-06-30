@@ -47,7 +47,7 @@ As a general rule, keep ambiguous work local and delegate only bounded work you 
 
 ## Exercise 1: Start the Playwright foundation locally
 
-In this exercise you'll create the first browser test signal for the AssetTrack UI and use it to validate the accessibility work from Module 2. You'll touch `playwright.config.ts`, `tests/playwright/accessibility.spec.ts`, and root `package.json` and lockfile updates — plus narrow Astro accessibility files only if the tests prove a real gap.
+Let's start by creating the first browser test signal for the AssetTrack UI and using it to validate the accessibility work from Module 2. You'll touch `playwright.config.ts`, `tests/playwright/accessibility.spec.ts`, and root `package.json` and lockfile updates — plus narrow Astro accessibility files only if the tests prove a real gap.
 
 The goal is a tight evidence loop: scaffold tests, run them, classify each failure, and fix only what the evidence supports.
 
@@ -103,7 +103,7 @@ A few things can get in the way: the account or organization may have remote ses
 
 ## Exercise 2: Steer the test session with `/remote`
 
-In this exercise you'll prove you can control the active Copilot CLI session from GitHub while the Playwright validation runs. No source files are required.
+Now let's prove you can control the active Copilot CLI session from GitHub while the Playwright validation runs. No source files are required.
 
 1. In the same Copilot CLI session, enter `/remote on`.
 2. Open the GitHub.com link Copilot provides and sign in with the same GitHub account that started the CLI session.
@@ -130,7 +130,7 @@ A useful delegation task spells out the primary goal, secondary goals, the files
 
 ## Exercise 3: Delegate the test backfill
 
-In this exercise you'll create a reviewable handoff for Copilot cloud agent and use it to expand the test suite through a draft PR. You'll add `docs/delegations/test-backfill.md`, push a branch such as `test-suite-foundation`, and end with a delegated draft PR adding tests under `tests/playwright/`, `services/assets-svc/Tests/`, and `services/reporting-svc/tests/`.
+Finally, let's create a reviewable handoff for Copilot cloud agent and use it to expand the test suite through a draft PR. You'll add `docs/delegations/test-backfill.md`, push a branch such as `test-suite-foundation`, and end with a delegated draft PR adding tests under `tests/playwright/`, `services/assets-svc/Tests/`, and `services/reporting-svc/tests/`.
 
 1. Ask Copilot CLI to create `docs/delegations/test-backfill.md` with a brief for Copilot cloud agent that captures the primary goal:
 
