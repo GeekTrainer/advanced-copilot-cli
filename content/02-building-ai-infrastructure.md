@@ -61,7 +61,7 @@ Path-scoped instruction files let you apply targeted rules by specifying an `app
 
 ## Exercise 1: Create instruction files for AssetTrack
 
-In this exercise you'll first capture existing conventions and patterns in the codebase in a baseline instructions file, then add path-scoped instruction files for each stack.  
+Let's start by capturing existing conventions and patterns in the codebase in a baseline instructions file, then adding path-scoped instruction files for each stack.  
 
 ### Generate the baseline instructions
 
@@ -149,20 +149,20 @@ Custom agents live in `.github/agents/` (for repo-scoped) or `~/.copilot/agents/
 
 ## Exercise 2: Create an Accessibility Expert custom agent 
 
-In this exercise, you'll add a reusable `Accessibility Expert` custom agent and use it against the frontend code. Instead of designing the agent from scratch, you'll reuse one from the Awesome GitHub Copilot repo, a community-curated collection of copilot customizations that are ready to drop in. 
+Now let's add a reusable `Accessibility Expert` custom agent and use it against the frontend code. Instead of designing the agent from scratch, you'll reuse one from the Awesome GitHub Copilot repo, a community-curated collection of copilot customizations that are ready to drop in. 
 
 1. Browse the [Awesome GitHub Copilot][awesome-copilot] website and in the search bar, type "accessibility" to find related customizations.
 
-2. Select the **Agent** filter, and find the `Accessibility Expert - Agent`. Click on it.
+2. Select the **Agent** filter, and find the `Accessibility Expert - Agent`. Select it.
 
 3. This previews the agent definition file that you can quickly review to confirm it fits your use case.
 
-4. At the top of the preview page, click on **Render** first, then **Copy** and move back to your codespace.
+4. At the top of the preview page, select **Render** first, then **Copy** and move back to your codespace.
 
 5. Create a new file - `.github/agents/accessibility-expert.agent.md` - and paste the copied content into it.
 
 > [!NOTE]
-> Tools and toolsets are updated frequently, so you might notice some of the tools mentioned in the agent definition file are no longer available or have changed names. If that's the case,  click on **Configure Tools ...** right above the `tools: ...` definition in the agent file, and select the **Built-in** and **GitHub MCP** checkboxes. This will update the agent definition with the current tool names and you can always adjust the allowlist accordingly.
+> Tools and toolsets are updated frequently, so you might notice some of the tools mentioned in the agent definition file are no longer available or have changed names. If that's the case,  select **Configure Tools ...** right above the `tools: ...` definition in the agent file, and select the **Built-in** and **GitHub MCP** checkboxes. This will update the agent definition with the current tool names and you can always adjust the allowlist accordingly.
 >
 > Ensure you enable the GitHub tools for a later exercise in this module.
 
@@ -200,11 +200,11 @@ This last exercise guides you to install the `make-repo-contribution` skill and 
 
 1. Browse the [Awesome GitHub Copilot][awesome-copilot] website and in the search bar, type "contribution" to find related customizations.
 
-2. Select the **Skill** filter and find the `Make Repo Contribution - Skill`. Click on it.
+2. Select the **Skill** filter and find the `Make Repo Contribution - Skill`. Select it.
 
-3. A skill can be a single `SKILL.md` file or a collection of files with additional scripts and assets. At the top of the preview page, click on **SKILL.md** to view the other files included in the skill. You should see the `SKILL.md` file, a `assets/issue-template.md` file and a `assets/pr-template.md` file.
+3. A skill can be a single `SKILL.md` file or a collection of files with additional scripts and assets. At the top of the preview page, select **SKILL.md** to view the other files included in the skill. You should see the `SKILL.md` file, a `assets/issue-template.md` file and a `assets/pr-template.md` file.
 
-4. Click on **Download** to get the full skill package and move back to your codespace.
+4. Select **Download** to get the full skill package and move back to your codespace.
 
 5. Create a new folder - `.github/skills/` and move the downloaded skill folder into it, so the structure looks like `.github/skills/make-repo-contribution/` with the three files inside.
 
