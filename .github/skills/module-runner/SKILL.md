@@ -1,8 +1,8 @@
 ---
 name: module-runner
 description: |
-  Simulate a learner running an advanced-copilot-cli course module end-to-end. Read a module from content/NN-*.md, execute every learner step in order on the machine where the skill runs, run every command and prompt individually, verify outcomes, and write findings to issues/NN-issues.md.
-  USE FOR: run a module, test a module, validate a course module, simulate a student, learner walkthrough, find module issues, run module steps.
+  Simulate a learner running an advanced-copilot-cli course module end-to-end. Read a module from content/NN-*.md, execute every learner step in order on the machine where the skill runs, run every command and prompt individually, verify outcomes, and write findings to issues/NN-issues.md. Can also build or refresh a module's official solution branch by driving a real Copilot CLI instance with the module's own prompts.
+  USE FOR: run a module, test a module, validate a course module, simulate a student, learner walkthrough, find module issues, run module steps, build a solution branch, refresh a solution branch by driving Copilot CLI.
   DO NOT USE FOR: editing course content without running it, generic code review, running Azure agentic journeys, or static-only content review.
 ---
 
@@ -64,25 +64,26 @@ Do not run learner commands from the course root unless the module explicitly sa
 
 If the module names a target learner repository, such as the Module 3 instruction to open an AssetTrack repository created from the `GeekTrainer/legacy-app` template, clone or copy that repository into `learner-workspace/` and run the module there. Prefer a fresh clone or copy so the complete resulting state is preserved for review. If the target repository, repository URL, branch, or credentials are not available, stop before the first dependent learner step and record a missing-prerequisite or external-service blocker in the issue report.
 
-### Chapter assets and catch-up setup
+### Solution-branch catch-up setup
 
-Before running learner actions, check whether the course repository has chapter-specific assets under `assets/<module-number>/`. Read any `README.md` files there and decide whether the module depends on those assets for a jump-in learner path or prerequisite catch-up.
+A jump-in learner catches up by starting from the previous module's solution branch on the template repository, not by running an asset script. Read the module's catch-up instructions to find the branch name. For example, Module 3 has the learner start from the Module 2 solution branch `02-building-ai-infra-solution`, which contains the Module 2 AI infrastructure a fresh AssetTrack repository would otherwise be missing.
 
-If the module has catch-up assets that are required for a valid test run, apply them to the learner repository after the learner repository is cloned or copied and before dependency install, devcontainer setup, Copilot prompts, app startup, commits, pushes, or delegation. For example, Module 3 provides `assets/03/section-02-catchup/` to add the Module 2 AI infrastructure to a fresh AssetTrack repository.
+When a module depends on a solution branch for a valid test run, get onto that branch after the learner repository is cloned or copied and before dependency install, devcontainer setup, Copilot prompts, app startup, commits, pushes, or delegation.
 
-When a catch-up folder provides scripts, run the appropriate script from the course repo host and pass the learner repository path explicitly:
+If you create the learner repository from the template with `gh repo create --template`, pass `--include-all-branches` so the solution branches come along, then check out the branch:
 
 ```bash
-bash assets/<module-number>/<catch-up-folder>/scripts/apply-*.sh <learner-repo-root>
+git -C learner-workspace/<repo> checkout 02-building-ai-infra-solution
 ```
 
-On Windows, use the PowerShell script when available:
+If the solution branch is not present in the learner repository, fetch it from the template repository into a local branch first:
 
-```powershell
-pwsh -File assets/<module-number>/<catch-up-folder>/scripts/apply-*.ps1 -TargetRepo <learner-repo-root>
+```bash
+git -C learner-workspace/<repo> fetch https://github.com/GeekTrainer/legacy-app 02-building-ai-infra-solution:02-building-ai-infra-solution
+git -C learner-workspace/<repo> checkout 02-building-ai-infra-solution
 ```
 
-Do not force overwrites unless the user explicitly approves. If the script refuses to overwrite existing files, inspect the existing learner files, record the result, and continue only when the existing files satisfy the module's prerequisite state. Record the asset folder, script path, command, output, and copied artifact summary in `logs/commands.md` and `logs/transcript.md`.
+Record the solution branch, commands, and output in `logs/commands.md` and `logs/transcript.md`. If the required solution branch is unavailable, record a missing-prerequisite blocker and stop before the first dependent learner step.
 
 ### GitHub template repository setup
 
@@ -179,6 +180,51 @@ Do not edit the course module itself while running it unless the user explicitly
 
 For commits, pushes, cloud delegation, Azure deployment, paid resources, or other external side effects, proceed only when the current user invocation explicitly authorizes a full run that includes those side effects, or pause for approval. If approval is not available, record the step as blocked instead of skipping it silently.
 
+## Solution-branch mode: build a module's solution by driving Copilot CLI
+
+Use this mode when the user asks to build or refresh a module's official solution branch (for example `NN-<slug>-solution`) rather than only to find issues. The rule that makes this mode "real": do not hand-author the solution artifacts yourself. Drive a genuine Copilot CLI instance with the module's own prompts so the solution is actually Copilot-generated, then commit it. This mode reuses the devcontainer-first execution and solution-branch catch-up rules above, and still logs content problems to the issue report.
+
+### Set up the branch and environment
+
+1. Clone the learner template repository, check out the previous module's solution branch, then create the new solution branch off it: `git checkout -b NN-<slug>-solution`.
+2. Bring up the project devcontainer (`devcontainer up --workspace-folder <learner-root>`) and verify the toolchains inside it. Run every command and every Copilot prompt through `devcontainer exec`. Never build, test, or generate on the bare host — the polyglot stacks (Java, .NET, Python, Node, Maven, Playwright) usually only exist inside the container.
+
+### Authenticate the nested Copilot CLI
+
+The container's `copilot` must be authenticated, and the running agent cannot log in on the user's behalf. `gh` is usually not installed in the container, so `gh auth login` will not work there.
+
+1. Ask the user to authenticate once themselves so their token never appears in command logs: they open a container shell (`devcontainer exec --workspace-folder <learner-root> bash`), run `copilot`, then `/login` (device flow). Auth persists in the container's `~/.copilot/`.
+2. Verify before proceeding with a trivial headless prompt: `copilot -p "Reply with exactly: AUTH_OK" --model <model> --allow-all`.
+
+### Drive Copilot with the module's exact prompts
+
+1. Run each module prompt non-interactively: `copilot -p "<verbatim module prompt>" --model <model> --allow-all`. `--allow-all` (or at least `--allow-all-tools`) is required for non-interactive tool use.
+2. Chain steps in one session for continuity with `--resume=<sessionId>`. The id prints at the end of each run as `Resume  copilot --resume=<id>`.
+3. For agent steps, add `--agent <slug>` (for example `--agent accessibility-expert`), matching the module's `/agent` instruction.
+4. Use the module's exact prompts, in order, and run the tests and commands the module specifies. When Copilot's generated tests fail or it abandons a required area, re-prompt with concrete guidance exactly as a stuck learner would, then re-run — do not silently hand-fix its output.
+
+### Verify, then commit
+
+1. Do not trust Copilot's success summary. Independently confirm every required deliverable exists and passes; Copilot will sometimes declare success while silently dropping required tests.
+2. Commit the generated artifacts in the module's narrative order with a `Co-authored-by: Copilot` trailer (Copilot genuinely authored them). Keep the branch local; push, open a PR, or delegate only with explicit user approval.
+
+### Runtime-only and cloud steps
+
+- `/remote` is runtime-only and produces no committable files. Document it; do not fabricate an artifact.
+- `/delegate` needs a pushed branch and the Copilot cloud agent (an asynchronous external PR). For a local-only solution branch, generate the delegated backfill with a local Copilot session as a documented stand-in, or push and delegate for real only with approval.
+
+### What to watch for
+
+These behaviors showed up when building the Module 3 solution branch and are worth anticipating:
+
+- Copilot over-generates: expect multiple `*.spec.ts` files and extra `*.md` docs even when the module implies a single file. Constrain in the prompt if a tight solution is needed.
+- Auto-generated scaffold or sample tests can be buggy (for example an ambiguous locator that fails Playwright strict mode) and muddy the module's "classify each failure" step.
+- Briefs balloon: Copilot invents filenames, test counts, and success matrices. Constrain the prompt if you need the module's concise brief.
+- Generated scaffolds often skip housekeeping the module expects, such as gitignoring `test-results/` and `playwright-report/`.
+- Backend test isolation via a process-global environment variable (for example `ASSETS_DB_PATH`) can race under parallel test runners. Watch for intermittent failures and disable parallelization if needed.
+- Inline `httpx.AsyncClient` context managers are hard for the agent to mock, and it may drop required tests. Hint the synchronous `TestClient` plus monkeypatched `httpx.AsyncClient` approach, or factor the calls into helpers.
+- Log every module-content problem found this way to `issues/<module-number>-issues.md` (or the file the user names), the same as learner mode.
+
 ## Issue reporting
 
 Create the `issues/` directory if it does not exist. Always write `issues/<module-number>-issues.md` at the end of a run. If there are no issues, write a short report that says no issues were found and includes the executed scope.
@@ -252,4 +298,8 @@ Run module-runner for content/03-test-suite-remote-delegation.md.
 
 ```text
 Use module-runner to simulate a learner through Module 3 and write issues to issues/03-issues.md.
+```
+
+```text
+Use module-runner in solution-branch mode: build the Module 3 solution branch by driving Copilot CLI through the exercises, and log any content issues to 03-issues.md.
 ```
