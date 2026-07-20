@@ -16,7 +16,7 @@ You've worked Copilot CLI through a brownfield, multi-stack codebase, codified y
 Talking points:
 
 - **Working with Copilot CLI** ([Module 1][m01]) — the harness, agent loop, tool surface, permission model.
-- **Building AI infrastructure foundation** ([Module 2][m02]) — exploring a brownfield project, filling doc gaps, generating `copilot-instructions.md` with `/init`, scoped `.instructions` files, the `accessibility-updater` custom agent, and the imported `make-repo-contribution` skill.
+- **Building AI infrastructure foundation** ([Module 2][m02]) — exploring a brownfield project, filling doc gaps, generating `copilot-instructions.md` with `/init`, scoped `.instructions` files, the `Accessibility Expert` custom agent, and the imported `make-repo-contribution` skill.
 - **Enhancing the test suite with remote and delegation** ([Module 3][m03]) — Playwright tests locally, `/remote` against a hosted environment, `/delegate` to the Copilot cloud agent, reviewing the resulting PR.
 - **Shaping Copilot CLI's lifecycle with hooks** ([Module 4][m04]) — wiring lifecycle hooks so tests, lint, and build feedback flow back to the agent automatically.
 - **Adding a new feature** ([Module 5][m05]) — `/research` for the library choice, `/plan` + rubber-duck, QA + accessibility custom agents, `/fleet` for parallel execution.
