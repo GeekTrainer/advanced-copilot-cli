@@ -17,6 +17,8 @@ These rules apply to every `.md` file in this repo. The course content renders o
 - Use ATX headings (`#`, `##`, `###`) with a single space after the `#`. Do not skip heading levels.
 - Code fences must declare a language (` ```bash `, ` ```ts `, ` ```json `, ` ```text ` for plain output). Use ` ```text ` rather than an unfenced indented block for shell output.
 - Use `-` for unordered list bullets. Be consistent within a file.
+- Keep list items tight: never put a blank line between consecutive list items. A blank line between items makes the whole list "loose" and the renderer adds vertical space between every item. This applies to ordered and unordered lists alike, and ordered-list numbering still increments correctly without the blank lines.
+  - When one item needs a child block (a code fence, a nested list, or a second paragraph), indent that block to align with the item's text and give it the blank line the block requires — but do not blank-separate the plain sibling items around it. See the stepped exercises in `content/03` and `content/07` for the pattern.
 - Images need descriptive alt text. Avoid screenshots of terminal output — paste the text in a fenced block instead.
 
 ## Links
@@ -33,6 +35,9 @@ These rules apply to every `.md` file in this repo. The course content renders o
 - Never wrap the link in an extra sentence whose only job is to point at it ("For more information, see [X]."). Weave the link into a sentence that already exists.
   - Avoid: `Copilot CLI supports custom agents. For more details, see [the agents documentation][agents].`
   - Use: `Copilot CLI supports [custom agents][agents] for repeatable workflows.`
+- Never introduce a link with a lead-in phrase whose only job is to hand off to it ("walked through in [X]", "described in [X]", "documented in [X]", "covered in [X]", "as explained in [X]"). The link must flow as part of a sentence that would stand on its own, anchored on the words that describe the destination.
+  - Avoid: `Agents get their own path, walked through in [Preparing to use custom agents][enterprise-custom-agents].`
+  - Use: `Agents get their own path. [Custom agents have a first-class enterprise tier][enterprise-custom-agents] that needs no plugin at all.`
 - Link text should be a meaningful phrase from the surrounding sentence — the page title, a feature name, or a descriptive noun phrase — not a URL or filename.
 - Use descriptive labels for reference definitions in lowercase kebab-case (`[gh-alerts]`, not `[1]`, `[link]`, or `[GH-Alerts]`). GFM case-folds labels, but keeping them lowercase-kebab makes them easy to grep and visually consistent. Group all definitions at the bottom of the file in the order they first appear.
 - Strip language/locale codes from URLs so readers land in their own locale. Remove `/en/`, `/en-us/`, `/es/`, etc., from the path.
@@ -68,6 +73,8 @@ Valid markers: `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`. 
 
 Use admonitions sparingly — at most one per section, and never two in a row. If the content needs more than a short paragraph, promote it to its own heading instead. See the [GitHub Docs style guide on alerts][gh-style-alerts].
 
+Keep admonitions at the root (left) margin — never indent them inside a list item. The renderer doesn't handle indented `> [!TIP]` blocks reliably. When a callout belongs mid-list, break the ordered list around it: end the list, place the admonition at root, then resume the list and set the next item's number explicitly so the sequence continues (e.g. `2.`).
+
 ## Course-content specifics
 
 - The repo's narrative voice is concise and direct. Avoid filler ("In this module, we will…", "Let's go ahead and…"). Cut sentences that don't add information.
@@ -83,10 +90,12 @@ When writing or reviewing a markdown change, confirm:
 
 - [ ] No bold or italic formatting on file names, directory names, or commands — only backticks.
 - [ ] Admonition markers use `[!NOTE]` (bang inside brackets), one per section, marker on its own `>` line.
+- [ ] Admonitions sit at the root margin, never indented inside a list item; mid-list callouts break the list and resume numbering explicitly.
 - [ ] Each paragraph, list item, and blockquote is a single unbroken line.
+- [ ] List items are tight — no blank lines between consecutive items (blank lines appear only to attach a child block to an item).
 - [ ] Every code fence has a language identifier.
 - [ ] Links use reference style with descriptive labels (no inline URLs, no `[click here]` / `[learn more]` / `[here]`).
-- [ ] No "For more information, see X" sentences — links are woven into existing prose.
+- [ ] No "For more information, see X" sentences and no lead-in phrases ("walked through in X", "described in X") — links are woven into existing prose and anchored on descriptive words.
 - [ ] URLs have no `/en/` or other locale codes in the path.
 - [ ] Headings use ATX style with a space after `#` and sentence case.
 - [ ] Product names match canonical casing (`GitHub`, `Copilot CLI`, `.NET`, `FastAPI`, `AssetTrack`).
