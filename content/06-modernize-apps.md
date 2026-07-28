@@ -51,13 +51,22 @@ Agents change the speed of each step, not the steps themselves. An agent can ass
 >
 > We'll be walking through the process by hand, using research, custom agents, and tests. Basically, you can think of this as doing the math by hand to see the numbers, then you can reach for a calculator in the future.
 
+## Model choice during the upgrade process
+
+GitHub Copilot provides access to numerous models of various levels, including the ability to bring your own key. This allows you to choose the right model for the job.
+
+As you work through the application modernization flow, you'll move back and forth between higher-end tasks, like planning and research, to lower-end tasks, like writing code and generating tests. With `/model` you can switch to an appropriate model depending on the needs of the current ask, both saving time and reducing the credit usage necessary to complete the operation. For example, you might choose Claude Opus 4.8 to build the plan, then assign an agent using MAI-Flash-1 to implement the code as defined in the plan.
+
+> [!NOTE]
+> During our exploration here we're going to use `auto` as our model choice, which allows Copilot to choose the model it thinks is most appropriate for the task. This is both to streamline the lesson and to allow for completion of the course with reduced credit usage. When it comes time to being complex operations on your production codebase, you can deploy various strategies to choose the right model at the right time.
+
 ## Giving Copilot better signal: LSP and documentation MCP
 
-Before Copilot changes a line of the upgrade, the better it understands the code and frameworks being used the better it'll be able to generate the necessary updates. it needs to understand the code as a compiler does and understand the target framework as its maintainers document it. Two extension points cover those needs.
+Before Copilot makes upgrade changes, it needs a strong signal about both the code it is changing and the framework it is targeting. It should understand the code the way a compiler does, and understand the target framework the way its maintainers document it. Two extension points provide that signal.  
 
-A [Language Server Protocol (LSP)][copilot-cli-lsp-concept] server gives Copilot structured code intelligence — go-to-definition, find-references, hover types, workspace symbol search — from the language's own analyzer rather than from text matching. On a modernization that precision matters: when Copilot needs to know every caller of a method whose signature changed, or whether a renamed symbol is fully rewired, an LSP answers from the compiler's model of the code, and it does so with compact structured results instead of reading whole files into the conversation. Copilot CLI uses a configured LSP automatically whenever one is available for the language in play.
+A **[Language Server Protocol (LSP)][copilot-cli-lsp-concept]** server gives Copilot structured code intelligence — go-to-definition, find-references, hover types, workspace symbol search — from the language's own analyzer rather than from text matching. On a modernization that precision matters: when Copilot needs to know every caller of a method whose signature changed, or whether a renamed symbol is fully rewired, an LSP answers from the compiler's model of the code, and it does so with compact structured results instead of reading whole files into the conversation. Copilot CLI uses a configured LSP automatically whenever one is available for the language in play.
 
-An MCP server extends what Copilot can *do*; a documentation MCP server points that extension at first-party docs. [Model Context Protocol (MCP)][mcp-concept] is an open standard for giving a model access to external tools and data, and Copilot CLI ships with the GitHub MCP server built in. For a Spring Boot and Jakarta EE upgrade the documentation that matters is the frameworks' own, and the most direct way to reach it is [GitMCP][gitmcp], an open-source server that turns any public GitHub repository into a documentation surface. Point it at `spring-projects/spring-boot` and Copilot reads Spring's own docs straight from the source, with no account or API key — and because it's open source you can self-host it. Pointing Copilot at a live docs surface is what keeps its framework claims tied to current guidance instead of whatever version happened to be current when its training data was frozen; for a framework major upgrade, where the whole point is that things changed, that freshness is the difference between advice you can trust and advice you have to re-verify by hand.
+2. **An MCP server** extends what Copilot can *do*; a documentation MCP server points that extension at first-party docs. [Model Context Protocol (MCP)][mcp-concept] is an open standard for giving a model access to external tools and data, and Copilot CLI ships with the GitHub MCP server built in. For a Spring Boot and Jakarta EE upgrade the documentation that matters is the frameworks' own, and the most direct way to reach it is [GitMCP][gitmcp], an open-source server that turns any public GitHub repository into a documentation surface. Point it at `spring-projects/spring-boot` and Copilot reads Spring's own docs straight from the source, with no account or API key — and because it's open source you can self-host it. Pointing Copilot at a live docs surface is what keeps its framework claims tied to current guidance instead of whatever version happened to be current when its training data was frozen. For a framework major upgrade where the whole point is that things changed, that freshness is the difference between advice you can trust and advice you have to re-verify by hand.  
 
 ### Where LSP and MCP configuration live
 
@@ -72,7 +81,7 @@ You'll give Copilot structured intelligence for AssetTrack's Java code and a fir
 Start with the code signal: install the Eclipse JDT language server through the `lsp-setup` skill and commit its configuration so the whole team shares the same view of the code.
 
 1. Return to your codespace. If you closed it, navigate to your repository on GitHub.com, select **Code** > **Codespaces**, then reopen your existing codespace.
-2. Open a terminal by selecting <kbd>Ctrl</kbd> + <kbd>`</kbd>, then start Copilot CLI from the repository root by running `copilot --yolo`.
+2. Open a terminal by selecting <kbd>Ctrl</kbd> + <kbd>\`</kbd>, then start Copilot CLI from the repository root by running `copilot --yolo`.
 3. If prompted, trust the project folder by selecting **Yes, and remember this folder for future sessions**.
 4. Run `/models`, select **Auto** from the list, and select <kbd>Enter</kbd>.
 5. Ask Copilot to install the skill directly from the [Awesome GitHub Copilot][awesome-copilot] collection by entering the prompt:
@@ -125,7 +134,7 @@ Now add the framework signal: register GitMCP, pointed at Spring Boot's own repo
     - **Server type**: **HTTP**
     - **URL**: `https://gitmcp.io/spring-projects/spring-boot`
 3. Select <kbd>Ctrl</kbd> + <kbd>S</kbd> to save, then <kbd>Esc</kbd> to leave the form.
-4. Confirm the server loaded by running `/mcp` and checking that `gitmcp-spring-boot` appears alongside the built-in GitHub server.
+4. Confirm the server loaded by running `/mcp list` and checking that `gitmcp-spring-boot` appears alongside the built-in GitHub server.  
 5. Select <kbd>Esc</kbd> to exit the MCP configuration screen.
 
 > [!TIP]
@@ -196,7 +205,7 @@ When you're done, `audit-svc` has a green safety net on Spring Boot 2.7 — the 
 
 You could run the migration from your main session, but a modernization is a good candidate for a dedicated custom agent, because a written scope and a small tool surface keep the work reviewable and repeatable. A migrator agent whose instructions pin it to one service — its source, its build, and the repo wiring that service depends on — stays out of the frontend and the other services, and because its behavior is written down, you can point it at the next legacy service without re-explaining the job.
 
-One caveat, stated honestly: that scope is an instruction the agent follows, not a sandbox. A custom agent's tools control the *kinds* of actions it can take — read, edit, run commands — but `edit` and `shell` still reach the whole repository, so the agent keeps to the service it's migrating and that service's wiring because its instructions say so and because you confirm it in the diff, not because anything physically stops it. That is exactly why the approval gate matters, and why the finishing edits it makes to shared files like the test router and `package.json` are the ones to read most closely.
+One caveat, stated honestly: that scope is an instruction the agent follows, not a sandbox. A custom agent's tools control the *kinds* of actions it can take — read, edit, run commands — but `edit` and `execute` still reach the whole repository. The agent keeps to the service it's migrating and that service's wiring because its instructions say so. That is exactly why the approval gate matters, and why the finishing edits it makes to shared files, like the test router and `package.json`, are ones to read most closely.  
 
 The migrator's instructions encode the process, not a specific service: read the saved plan, apply one phase at a time, run the service's tests after each phase, stop after each phase and wait for your approval before starting the next, and report rather than pressing on when a phase fails. Once the phases are approved and green it finishes the job the way a careful person would — running the end-to-end suite as a final gate, wiring the service into the repo's test router and dev script, and writing a status report — so what comes out the other end is a fully migrated service, not just an edited `pom.xml`. That approval gate is what keeps a fast agent honest: validation between phases is where a framework upgrade catches its own mistakes, and it only helps if you read the diff before waving the agent on.
 
@@ -211,10 +220,10 @@ Now encode the process itself in a reusable agent whose written scope keeps the 
 1. Ask Copilot to write the agent definition from the migration plan you saved, so the process the research captured becomes the agent's instructions instead of a list you re-describe by hand:
 
     ```text
-    Read docs/modernization/audit-svc-plan.md, then create a custom agent at .github/agents/java-migrator.agent.md named "Java migrator" with read, edit, and shell tools that follows that plan to modernize one service and its wiring at a time — never another service or the frontend. It works one phase at a time, running the service's Maven tests after each phase and stopping for my approval before the next, then runs the Playwright end-to-end suite (npm run test:e2e) as a final gate. Finish with a testing status report confirming both layers pass on the target stack.
+    Read docs/modernization/audit-svc-plan.md, then create a custom agent at .github/agents/java-migrator.agent.md named "Java migrator" with read, edit, and execute tools that follows that plan to modernize one service and its wiring at a time — never another service or the frontend. It works one phase at a time, running the service's Maven tests after each phase and stopping for my approval before the next, then runs the Playwright end-to-end suite (npm run test:e2e) as a final gate. Finish with a testing status report confirming both layers pass on the target stack.  
     ```
 
-2. Open `.github/agents/java-migrator.agent.md` and review it. Confirm the scope (one service plus its wiring, never another service's source or the frontend), the read/edit/shell tools, the phase-by-phase rule that stops for your approval and runs the service's tests between phases, the finishing work it does once the phases are green — the end-to-end gate, the test-router route, and the dev-script cleanup — and the closing testing status report that confirms both the unit and end-to-end suites passed on the updated framework and runtime.
+2. Open `.github/agents/java-migrator.agent.md` and review it. Confirm the scope (one service plus its wiring, never another service's source or the frontend), the read/edit/execute tools, the phase-by-phase rule that stops for your approval and runs the service's tests between phases, the finishing work it does once the phases are green — the end-to-end gate, the test-router route, and the dev-script cleanup — and the closing testing status report that confirms both the unit and end-to-end suites passed on the updated framework and runtime.  
 3. Reset to a clean conversation with `/new` so Copilot picks up the new agent, then confirm it with `/agent`. You should see `Java migrator` in the list. Select <kbd>Esc</kbd> to exit the agent menu.
 
 The `Java migrator` agent now exists as a repository scoped asset — one you'll use to drive your migrations.
