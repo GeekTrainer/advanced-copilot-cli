@@ -152,6 +152,9 @@ A good research prompt for a migration names the service, the current stack, the
 
 Treat the result as evidence, not as the decision. The upgrade touches real things: Spring Boot 3 raises the minimum Java version, so the runtime and the framework move together; the move to [Jakarta EE 9][jakarta-ee-9] renamed the `javax.*` APIs to `jakarta.*`, so any affected imports have to change; and matching `workforce-svc` means the runtime and framework generation, not the data layer — so keep `audit-svc`'s working `JdbcTemplate` code in this upgrade and record the larger move to [Spring Data JPA][spring-data-jpa] as a separate follow-on rather than smuggling a rewrite into a framework bump. A good report will surface each of these with a source; your job is to confirm the sources are real and current before you let the plan drive code.
 
+> [!NOTE]
+> The riskiest part of a major upgrade is often the changes in default behavior, not renames and versions. A new major version can silently alter how the framework behaves out of the box, so code that never changed starts doing something different, and the failure shows up at runtime with no obvious link to anything you edited. That's why default behavior belongs in your research up front: a shifted default is far cheaper to surface in a report and hand to the agent as an explicit constraint than to debug in a failing service later. A research pass that digs to this depth takes real time and reads dozens of sources, which is exactly why the plan in the next exercise was produced once and captured as a reusable asset rather than regenerated live.
+
 ## Exercise 2: Get a research-backed migration plan for audit-svc
 
 The plan you'll drive the rest of the module from was produced by a real `/research` run — the research prompt in the tip below, pointed at `audit-svc` — and then trimmed so Copilot can consult it without re-reading a 700-line report every time it needs the recipe. It's a representative artifact: citation-backed, phased, and grounded in the actual `legacy-app` source. You'll pull it into the repo now so it becomes the first reusable asset of the modernization, then verify it before it drives any code.
@@ -267,6 +270,9 @@ When you're done, `audit-svc` runs on Java 21 and Spring Boot 3.5.3, its tests a
 
 Modernizing the first service was the expensive part. The second one is where building assets pays off: the same agent and the same playbook are most of the work already done — and because the playbook already captured the recipe, you don't need a second research pass to rediscover it. `auth-svc` is the other Java 11 / Spring Boot 2.7 service, and it differs from `audit-svc` in two ways that matter — it issues JWTs with the `jjwt` library, and its `JwtIssuer` is the one place in either service that actually imports `javax.annotation.PostConstruct`, which the Jakarta move renames to `jakarta.annotation.PostConstruct`.
 
+> [!TIP]
+> Those two differences are here on purpose. `auth-svc` isn't a clean re-run of `audit-svc`, and that's the point. It leans on an extra third-party library for its login tokens, and it uses one of the renamed building blocks that the framework upgrade moves from the old `javax` name to the new `jakarta` one — small, realistic ways that no two services are ever quite alike. When one of those trips a test, you're watching the safety net do its job, not the agent coming apart. A failing test is a precise signal you hand back to the agent — "this library changed," "this name moved" — and it adapts. That loop, where good prep plus a red test sharpens the next instruction, is exactly how better inputs produce better AI outcomes. Expect a little iteration on the second service, and read it as the process working rather than the agent misbehaving.
+
 1. Start a new session in Copilot to load the changes we just made by using the `/new` command.
 2. Build the safety net first, the same way you did for `audit-svc`. Have Copilot write the tests and confirm they pass against the current version so you have a baseline before anything changes:
 
@@ -302,6 +308,9 @@ You modernized AssetTrack's oldest service without letting the agent improvise, 
 - Reused the agent, a captured playbook, and an extended test router to modernize the second service faster than the first, then shipped both upgrades as a single reviewed pull request.
 
 The throughline is that AI changes the cost of each step, not the need for the steps. Assess, plan, protect, migrate, validate, and document is what keeps a fast agent producing an upgrade you can review — and the assets you build doing it are what make the next one cheap. Next, you'll take the agents, skills, and MCP servers you've built and distribute them across the whole organization [in the next module][next-lesson].
+
+> [!NOTE]
+> Now that you've run the loop by hand, the [GitHub Copilot modernization plugin][copilot-modernization-plugin] maps onto it almost one for one — same discipline, more of it automated. Its **assessment** stage is the code-and-docs signal you stood up with the LSP and the documentation MCP; its **planning** stage is the phased, citation-backed plan you produced with `/research` and saved into the repo; its **execution** stage is the scoped migrator agent applying reviewable phases. The self-verification its executors run — build, test, and validate with retry — is your test safety net, and the per-phase commits it preserves for review are your captured playbook. It even generalizes the scope and guardrails you hand-wrote into your agent into a reusable *rulebook*, so target stacks, upgrade standards, and compliance policies apply to every plan it generates. The calculator runs the same six steps you just did by hand — the difference is it runs them across a fleet of services at once, which is exactly why knowing the numbers first is what lets you trust the result.
 
 ## Resources
 
