@@ -104,7 +104,7 @@ You'll scaffold an MCP server that introspects AssetTrack's service databases an
 7. Test the new MCP server by using the following prompt:
 
     ```text
-    Where is the data for hardware events by employee stored, and what tables/columns relate hardware, employees, assignments, and recent events?```
+    Where is the data for hardware events by employee stored, and what tables/columns relate hardware, employees, assignments, and recent events?
     ```
 
     Watch the tool calls: Copilot should call `find_data` and `get_schema` and answer from the catalog — events from `audit_events` in the audit service, hardware from `assets` in the assets service, and the employee link from `assignments` and `employees` in the workforce service — instead of guessing or grepping the codebase.
