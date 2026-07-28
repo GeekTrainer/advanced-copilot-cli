@@ -184,32 +184,30 @@ Copilot CLI installs plugins from a marketplace, and a marketplace is just a rep
     Add a plugin marketplace manifest to this repo at .github/plugin/marketplace.json. Name the marketplace contoso-marketplace and list the contoso-assettrack-plugin with its name, description, and version, using the contoso-assettrack-plugin folder at the repo root as its source. Follow the marketplace.json format in the GitHub Copilot CLI plugin docs.
     ```
 
-With the marketplace created, we want to add it so we can test it. This is done through direct commands to Copilot CLI, meaning we'll need a new terminal window.
+With the marketplace created, add it from the Copilot CLI session you're already using so you can test the plugin without leaving the flow.
 
-1. Open a separate terminal for the Copilot CLI commands by selecting <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>`</kbd>.
-2. Register your repo as a marketplace by pointing at the repository root, then confirm it's known and browse its plugins:
+1. Register your repo as a marketplace by pointing at the repository root, then confirm it's known and browse its plugins:
 
-    ```bash
-    copilot plugin marketplace add .
-    copilot plugin marketplace list
-    copilot plugin marketplace browse contoso-marketplace
+    ```text
+    /plugin marketplace add .
+    /plugin marketplace list
+    /plugin marketplace browse contoso-marketplace
     ```
 
-3. Install the plugin from the marketplace by its `name@marketplace` identifier:
+2. Install the plugin from the marketplace by its `name@marketplace` identifier:
 
-    ```bash
-    copilot plugin install contoso-assettrack-plugin@contoso-marketplace
+    ```text
+    /plugin install contoso-assettrack-plugin@contoso-marketplace
     ```
 
 ### Test the plugin in action
 
-With the plugin installed, let's do a little spot-checking to ensure everything is installed and behaving as expected.
+With the plugin installed, do a little spot-checking in the same Copilot CLI session to ensure everything is installed and behaving as expected.
 
-1. In the current terminal window, start Copilot by using the command `copilot --yolo`
-2. Use the command `/mcp list` to list all MCP servers. You should see both assettrack-catalog MCP servers, with a note the one from the plugin is being used.
-3. Use the command `/agent` to list all installed agent. You should see the Accessibility agent with a mark that it's from a plugin.
-4. Select <kbd>Esc</kbd> to exit the agents list screen.
-5. Use the command `/skills list` to list all installed skills. You should see a group of available skills highlighted from the plugin.
+1. Use the command `/mcp list` to list all MCP servers. You should see both assettrack-catalog MCP servers, with a note the one from the plugin is being used.
+2. Use the command `/agent` to list all installed agents. You should see the Accessibility agent with a mark that it's from a plugin.
+3. Select <kbd>Esc</kbd> to exit the agents list screen.
+4. Use the command `/skills list` to list all installed skills. You should see a group of available skills highlighted from the plugin.
 
 The AssetTrack AI infrastructure is now a single unit. Everything you built piece by piece across the course — the accessibility agent, the contribution skill, the hooks, and the schema catalog MCP server — installs with one plugin, which is exactly what makes it something you can hand to the rest of Contoso.
 
