@@ -75,7 +75,8 @@ Use admonitions sparingly — at most one per section, and never two in a row. I
 - Don't anthropomorphize Copilot CLI ("Copilot is excited to help", "Copilot understands"). Describe what the tool does, not what it "thinks" or "feels".
 - In example commands shown in prose, prefer non-destructive forms. Use `rm -r` rather than `rm -rf` so a reader who copy-pastes still has a chance to abort.
 - Module files live in `content/` and are numbered `NN-short-slug.md`. The H1 is the module title. Cross-link adjacent modules via link reference definitions at the bottom of the file (see existing modules for the pattern).
-- Call the numbered course units "Module" — never "Section". This applies to H1 titles (`# Module 3 — ...`), cross-references in prose ("from Module 2", "in Modules 2–3"), and link text (`[Module 4][m04]`). Reserve the word "section" for an actual sub-part of a document, such as a heading within a module or a section of a generated report.
+- Call the numbered course units "Module" — never "Section" — wherever you do name one directly: the H1 title (`# Module 3 — ...`) and the previous/next navigation links. Reserve the word "section" for an actual sub-part of a document, such as a heading within a module or a section of a generated report.
+- Don't refer to another module by a bare number in body prose ("as we built in Module 4", "see Module 2"). A module number means nothing to a reader who doesn't remember the exact ordering. Instead, refer to the thing the learner built, did, or will do there, and put the module link on that descriptive text: `the [lifecycle hooks you built][m04]`, `a [Playwright suite you built earlier][m03]` — not "the hooks from [Module 4][m04]". The H1 title and the footer navigation links are the only exception; they name the module directly as wayfinding.
 - Name module link reference labels `mNN` to match the file number (`[m04]: ./04-lifecycle-hooks.md`), not `sNN` or other prefixes.
 
 ## Validation checklist
@@ -91,7 +92,7 @@ When writing or reviewing a markdown change, confirm:
 - [ ] URLs have no `/en/` or other locale codes in the path.
 - [ ] Headings use ATX style with a space after `#` and sentence case.
 - [ ] Product names match canonical casing (`GitHub`, `Copilot CLI`, `.NET`, `FastAPI`, `AssetTrack`).
-- [ ] Numbered course units are called "Module" (not "Section") in titles, prose, and link text, and use `mNN` reference labels.
+- [ ] Numbered course units are called "Module" (not "Section") wherever named directly; body-prose cross-references point at what the learner built or did with the module link on that descriptive text (no bare "Module N" in prose), and use `mNN` reference labels.
 - [ ] UI and keyboard instructions use "select", not "press", "click", "hit", or "tap".
 
 [gfm-spec]: https://github.github.com/gfm/
