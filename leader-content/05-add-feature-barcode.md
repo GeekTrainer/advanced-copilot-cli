@@ -1,0 +1,107 @@
+# Module 5 — Adding a new feature: barcode support (prose companion)
+
+> [!NOTE]
+> This is a prose companion to the Module 5 exercise content, not the step-by-step module itself. It describes the shape of the module — the scenario, the tools, and what a developer would do at each stage — and explains the reasoning behind each choice. The audience is leaders and decision-makers evaluating how the agentic workflow holds together, and authors who will turn this narrative into the hands-on module. Wherever the module will ask a developer to run a command, this document instead describes what would happen and why it matters.
+
+Adding greenfield features inside a brownfield app can be a challenge. It requires forethought and planning, finding the right existing services, making updates, and ensuring nothing breaks. As such, it's key that the work is scoped, researched, planned, and parallelized deliberately. An open-ended prompt like "add barcode support" is exactly the kind of request that sends an agent wandering across services, inventing schema, and producing a diff no one can review.
+
+Let's explore a solid path of research, plan, then build (with a fleet of agents) to ensure success - even in a legacy application.
+
+## What you will learn
+
+- How to use `/research` to choose a library before committing to an approach, and how to treat the resulting report as evidence rather than as a decision.
+- How to use `/plan` and plan mode to produce a written, bounded plan before any code changes, and how a rubber-duck critique catches the gaps a first plan always has.
+- How `/fleet` runs subagents in parallel: when that genuinely accelerates the work, when it backfires, and how to keep the combined diff reviewable.
+- What custom agents are, how they differ from instructions and skills, and why a quality-assurance agent — one that hands accessibility checks to the Accessibility Expert from Module 2 — makes a dependable quality gate once the parallel build is done.
+
+## Scenario
+
+> [!NOTE]
+> Starting state: the instructions, custom agents, and tests from Modules 2–3 are in place, and the lifecycle hooks from Module 4 are wired up. The work in this module modifies application code on a feature branch (for example, `feat/barcode-support`).
+
+AssetTrack tracks physical hardware — laptops, monitors, phones, badges — and every asset already carries a unique asset tag such as `CON-LPT-001`. Operators today read those tags by eye and type them in. Contoso wants each asset to carry a scannable QR code so that, in a later phase, an operator can point a phone at an asset and pull up its record. You've been tasked with finding a library that will allow for generating and scanning QR codes, putting forth a plan on the updates needed, then introducing the functionality to the application.
+
+## Tech topics
+
+This module introduces four capabilities and ties each one back to a specific stage of shipping the feature:
+
+- **`/research`** — a citation-backed investigation that lets you defend a library choice instead of guessing.
+- **`/plan` and rubber-duck critique** — a written plan produced before any edits, then deliberately critiqued before it's accepted.
+- **`/fleet`** — parallel subagents that build independent slices of the plan at the same time.
+- **A QA custom agent** — an imported persona that carries a testing standard, delegates accessibility confirmation to the Accessibility Expert agent, and acts as a quality gate after the build.
+
+The order is deliberate. Each stage produces the input the next one depends on: research settles the library, the plan turns that choice into bounded waves of work, `/fleet` builds those waves in parallel, and a quality-assurance custom agent gates the result before it's called done.
+
+## Choosing a barcode library with `/research`
+
+Taking on a new library dependency is not something to improvise. These choices carry consequences that outlive the afternoon you spend on it: its license has to be compatible with the project, it has to be actively maintained, and — the trap that catches most teams — it must not drag in native dependencies that break inside the production environment. A library that renders by leaning on the host operating system's graphics stack will pass on a developer's laptop and fail in the deployed environment. This is precisely the kind of question `/research` exists to answer.
+
+A good research prompt names the decision and its constraints rather than asking for a favorite. It states the use case (generate a QR image for an asset, server-side, in a .NET service), the runtime reality (the service runs in a Linux container, so no native graphics dependencies), and the decision criteria (permissive license, active maintenance, a pure-managed rendering path). A weak prompt — "what's the best QR library?" — gives the agent nothing to optimize against, and the report drifts toward generic popularity rankings.
+
+As with any response generated by AI, the report should be reviewed and decisions should be made thoughtfully. You should read it the way you'd read a colleague's recommendation: checking that the cited sources are real and current, that the recommendation names a specific library and version, and that the integration sketch points at the actual service.
+
+### In practice
+
+The developer runs `/research` with a prompt that spells out the use case, the container constraint, and the decision criteria, then pushes the agent to deepen any thin part of the report — a hand-waved licensing claim, a vague maintenance signal. The outcome is a short written report, committed alongside the code, that names a library and version and sketches how it slots into `assets-svc`. By the end of the stage the developer has a defensible choice and the citations to back it, which is exactly what they'll lean on when the plan in the next stage commits to that library.
+
+## Planning the feature with `/plan` and rubber-duck critique
+
+A written plan is the cheapest place to catch a mistake. Once an agent starts editing files and running tools, a wrong assumption costs real time to unwind; in a plan, it costs a sentence. That economy is the whole argument for planning first, and it's why this stage produces a plan and nothing else — no edits yet.
+
+The plan for barcode support has more substance than "generate an image," because the decision to store the code rather than regenerate it on every request introduces a genuine data change. Persisting the QR payload means the feature naturally separates into three waves. The first is a schema change in `assets-svc`: a new column on the assets table, populated when an asset is created or updated, plus a migration. The second is the API: a new endpoint, say `GET /assets/{id}/qr`, that renders the stored payload into an image using the library research settled on. The third is the UI: surfacing the code on the asset detail page, maybe at `services/web/src/pages/assets/[id].astro`, with the field threaded through the TypeScript model in between.
+
+The most valuable part of this stage is the critique. A first plan always reads as complete and almost always hides a gap, and rubber-ducking it — asking Copilot to argue with its own plan with a different model — is how that gap surfaces before it becomes a bug.
+
+### In practice
+
+The developer toggles plan mode or invokes `/plan` and asks for a plan that covers the schema change, the persistence and backfill, the new endpoint, the UI surface, and the tests across all of it. They then push back on anything vague — which files change, what the migration does, what happens to existing rows — and run a rubber-duck pass that asks what's missing and what would break. The plan is finished when it splits into a small number of independently reviewable waves and names specific files and changes, to the point where a teammate handed the plan would produce the same diff. The backfill catch is the signal that the critique did its job.
+
+## Executing in parallel with `/fleet`
+
+With a bounded plan in hand, the implementation is ready to run — and because the plan split cleanly, parts of it can run at the same time. `/fleet` spins up several subagents at once, each owning an independent slice of the work. The qualifier that matters is independent. Parallelism pays off when slices don't touch each other's inputs: separate files, separate test suites, a server change and a UI change that meet only at a stable contract.
+
+The barcode plan is a good fit because its waves were drawn along those lines. The schema-and-API work in `assets-svc` and the UI work in `services/web` meet only at the shape of the API endpoint. So once that contract is fixed, the two can proceed in parallel. Each subagent produces its own diff stream, which is what keeps the parallelism from turning into a tangle — the developer reviews each slice on its own terms rather than trying to make sense of one merged blast of changes.
+
+This is also where the discipline of the earlier stages pays off visibly. The reason these slices can run in parallel without stepping on each other is that the research settled the library and the plan drew clean seams. `/fleet` is fast here not because parallelism is inherently fast, but because the work was shaped to be parallelizable.
+
+### In practice
+
+The developer launches `/fleet` with subagents mapped to the plan's waves — one carrying the schema and endpoint work, another the UI surface — and reviews each subagent's diff independently. They confirm the code matches the plan: the code generates, persists, and renders; existing rows are backfilled; the endpoint returns an image; the detail page shows the QR card. The result is a feature that's built but not yet vouched for — several diffs produced quickly, in parallel, which is exactly the situation the next stage exists to check.
+
+## Gating quality with a QA custom agent
+
+Regardless of how code was created - written by hand, generated through AI, or some combination thereof, quality is of course key. We should always be reviewing our code for quality, but we can also let the AI take a first pass at it as well. We can use a custom agent that's been trained on the appropriate requirements as a validator of the code you just created.
+
+You met custom agents in Module 2. A custom agent is a configured persona of Copilot — a name, a description, an optional restricted toolset, and instructions that shape how it behaves on its slice of the work. It's a different mechanism from the other infrastructure already in place. Instructions describe what's true about the codebase and apply passively to every session. Skills are deterministic capabilities the agent can call. A custom agent is a personality with a scope and a toolset, invoked deliberately when its kind of work comes up, running in its own isolated context so its back-and-forth never clutters the main agent's window.
+
+Here that persona is a quality-assurance agent, and it carries a single, firm standard: for every behavior the plan named, there should be a test, and anything that resists testing should be flagged rather than quietly skipped. Its scope is test files plus the minimal production touches needed to make tests runnable, and its toolset is deliberately narrow — it has no business reaching across the whole repository or reworking the feature it's meant to be checking. Running it after code generation is what turns "the code appears to work" into "the behavior the plan promised is covered."
+
+A quality gate shouldn't try to be an expert in everything it checks, though. The new UI has to meet the same accessibility standard the rest of AssetTrack is held to — but that standard already lives in the Accessibility Expert agent built back in Module 2, which knows the project's WCAG target and its Astro and React conventions. Rather than copy that knowledge into the QA agent, the developer composes the two: the QA agent's instructions tell it to hand the new UI to the Accessibility Expert to confirm accessibility, and to treat a failed confirmation as a gap like any other. One agent owns "is the promised behavior covered," and it delegates "is the new surface accessible" to the agent that already owns that question.
+
+Encoding this as an agent rather than as a reminder in a prompt is what makes it dependable. A standard that lives in a sentence the developer has to remember to type lapses the first busy afternoon; a standard that lives in an agent applies every time that agent is invoked.
+
+### In practice
+
+The developer imports a quality-assurance agent rather than writing one from scratch — the same move as Module 2's Accessibility Expert: find the `qa-subagent` definition on Awesome GitHub Copilot, drop it into `.github/agents/`, and narrow it to the feature. Then, through Copilot, they add one rule to that agent — when the change includes UI, hand it to the Accessibility Expert agent and treat a failed accessibility confirmation as a gap. Running the QA agent over the integrated `/fleet` result, it adds the tests the parallel build left thin, runs them, delegates the new asset detail UI to the Accessibility Expert for a WCAG check, and reports anything — behavioral or accessibility — it couldn't make pass. What was a fast pile of diffs is now a feature with the coverage the plan asked for and an accessibility sign-off on the new surface.
+
+## Summary
+
+Barcode support is a small feature, but it's a real one: it changes the database, adds an API endpoint and a dependency, threads a field through to the UI, and carries tests across every layer it touches. That's enough substance to make a disciplined approach worthwhile, and bounded enough to actually finish. Walking it end to end, a developer would:
+
+- Use `/research` to choose a QR library they can defend, with the container constraint front and center and citations to back the choice.
+- Use `/plan` and a rubber-duck critique to turn that choice into a bounded, multi-wave plan — and catch the deep-link backfill problem before it becomes a bug.
+- Use `/fleet` to build the independent waves in parallel, then integrate a set of independently reviewable diffs.
+- Import a quality-assurance custom agent, compose it with the Accessibility Expert from Module 2, and run it as a gate — turning a fast parallel build into a feature with the test coverage the plan promised and an accessibility sign-off on the new UI.
+
+The throughline is that each stage feeds the next: research and planning make the parallel build safe, and a dedicated quality gate at the end catches what speed alone would miss. Next, you'll apply the same research-and-plan instincts to a larger problem — modernizing AssetTrack's older services — with `/research`, `/lsp`, MCP servers, and per-stack migrator agents in [Module 6][m06].
+
+## Resources
+
+- [Plan mode in Copilot CLI][copilot-plan]
+- [About custom agents in Copilot CLI][copilot-agents]
+- [Awesome GitHub Copilot — community-curated Copilot customizations][awesome-copilot]
+
+[m06]: ../content/06-modernize-apps.md
+[copilot-plan]: https://docs.github.com/copilot/how-tos/use-copilot-agents/use-copilot-cli
+[copilot-agents]: https://docs.github.com/copilot/concepts/agents/about-copilot-cli
+[awesome-copilot]: https://awesome-copilot.github.com/
