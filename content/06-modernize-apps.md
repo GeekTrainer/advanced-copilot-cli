@@ -27,7 +27,13 @@ AssetTrack is a polyglot system, and two of its services have aged badly. `audit
 You won't do both at once. You'll modernize `audit-svc` first because it's the smaller, better-bounded service — it has no security-token code and, as you'll confirm, no `javax` imports of its own to rewrite — so you can learn the shape of the work with fewer moving parts. Then you'll turn what you learn into assets — a migrator agent and a written playbook — that make `auth-svc` a repeat rather than a fresh start. `workforce-svc` is your reference for what "done" looks like: when `audit-svc` matches its Java version and Spring Boot version and still passes its tests, the upgrade is complete.
 
 > [!NOTE]
-> **Starting state**: your fork has the AI infrastructure from earlier modules in place — custom instructions, the `Accessibility Expert` agent, the [`make-repo-contribution` skill][m02] you built earlier, and the [lifecycle hooks][m04] you added. This module changes production code in `audit-svc` and `auth-svc`; you'll modernize both services, then ship the whole thing as a single pull request at the end with the `make-repo-contribution` skill, which creates the branch and opens the PR for you.
+> **Starting state**: your fork has the AI infrastructure from earlier modules in place — custom instructions, the `Accessibility Expert` agent, the [`make-repo-contribution` skill][m02] you built earlier, and the [lifecycle hooks][m04] you added. If you're jumping in here, check out the catch-up branch that holds them:
+>
+> ```bash
+> git checkout start-of-module-06
+> ```
+>
+> This module changes production code in `audit-svc` and `auth-svc`; you'll modernize both services, then ship the whole thing as a single pull request at the end with the `make-repo-contribution` skill, which creates the branch and opens the PR for you.
 
 ## Modernization is still a process, even with an agent
 

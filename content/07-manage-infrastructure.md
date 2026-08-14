@@ -21,7 +21,13 @@ The accessibility upgrade, the test backfill, the hooks, the barcode feature, an
 Closing that gap means lifting the setup out of AssetTrack and up to where the whole organization can reach it: AssetTrack's databases exposed as a shared schema catalog through an MCP server, the surrounding AI infrastructure packaged so it installs in a single step, and enterprise standards that put the setup in front of every Contoso developer the moment they authenticate — no cloning, no copying.
 
 > [!NOTE]
-> Starting state: your fork has a working set of AI infrastructure in place — custom instructions, custom agents, agent skills, lifecycle hooks, a Playwright test suite, and the modernized barcode feature, all committed to AssetTrack. The plugin and MCP work in this module targets your fork only, but the patterns are written for org-wide rollout.
+> Starting state: your fork has a working set of AI infrastructure in place — custom instructions, custom agents, agent skills, lifecycle hooks, a Playwright test suite, and the modernized barcode feature, all committed to AssetTrack. If you're jumping in here, check out the catch-up branch that holds them:
+>
+> ```bash
+> git checkout start-of-module-07
+> ```
+>
+> The plugin and MCP work in this module targets your fork only, but the patterns are written for org-wide rollout.
 
 ## Custom MCP servers as shared infrastructure
 

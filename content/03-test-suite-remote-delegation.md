@@ -6,13 +6,13 @@
 The accessibility and contribution infrastructure from [Module 2][m02] is useful only if the team can prove it keeps working. This module turns the first accessibility checks into a Playwright-backed feedback loop, uses `/remote` to steer the active CLI session remotely, and hands a bounded test backfill to Copilot cloud agent with `/delegate`.
 
 > [!NOTE]
-> If you're jumping straight to this module without finishing the earlier ones, start from the completed Module 2 solution branch. The exercises here assume the accessibility and contribution infrastructure from Module 2 is already in place.
+> If you're jumping straight to this module without finishing the earlier ones, check out the `start-of-module-03` catch-up branch. It holds the accessibility and contribution infrastructure the earlier modules produced, which the exercises here assume is already in place.
 >
-> 1. Follow the [course prerequisites][prerequisites] to create your AssetTrack repository from the [`geektrainer/legacy-app`][legacy-app] template. Ensure that you select **Include all branches** when you create it so the solution branches come along.
-> 2. In your codespace terminal, check out the Module 2 solution branch:
+> 1. Follow the [course prerequisites][prerequisites] to create your AssetTrack repository from the [`geektrainer/legacy-app`][legacy-app] template. Ensure that you select **Include all branches** when you create it so the catch-up branches come along.
+> 2. In your codespace terminal, check out the catch-up branch:
 >
 >     ```bash
->     git checkout 02-building-ai-infra-solution
+>     git checkout start-of-module-03
 >     ```
 >
 > This branch contains the completed AI infrastructure that this module builds on.

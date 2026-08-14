@@ -1,0 +1,114 @@
+# Notifies the GeekTrainer/legacy-app maintenance workflow when this course's
+# module content or assets change, so it can regenerate the affected
+# start-of-module-N catch-up branches behind its own human/CI approval gate.
+#
+# Contract (owned by the legacy-app session — do not change without coordinating):
+#   POST /repos/GeekTrainer/legacy-app/dispatches
+#   event_type: acc-content-changed
+#   client_payload:
+#     acc_sha         required, full 40-char ACC commit SHA
+#     acc_ref         required, e.g. refs/heads/main
+#     affected_module required, int 1..7 (module whose content/assets changed)
+#     acc_version     optional, YYYY-MM (defaults to the current month)
+#     reason          content-update | manual | scheduled
+#     dispatch_id     optional uuid (receiver generates one if absent)
+#   A changed path content/NN-*.md or assets/NN/ maps to affected_module = NN.
+#   One dispatch is sent per affected module.
+#
+# Requires a repository secret LEGACY_APP_DISPATCH_TOKEN: a token authorized to
+# send repository_dispatch events to GeekTrainer/legacy-app (a fine-grained PAT
+# or GitHub App installation token with contents:write on that repo). The
+# default GITHUB_TOKEN cannot dispatch to another repository.
+
+name: Notify legacy-app of content changes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/[0-9][0-9]-*.md'
+      - 'assets/[0-9][0-9]/**'
+  workflow_dispatch:
+    inputs:
+      affected_module:
+        description: 'Module number (1-7) to notify legacy-app about'
+        required: true
+      reason:
+        description: 'Dispatch reason recorded in the payload'
+        required: false
+        default: 'manual'
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out ACC
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine affected modules
+        id: modules
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          MANUAL_MODULE: ${{ github.event.inputs.affected_module }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            modules=$(printf '%s\n' "$MANUAL_MODULE" | tr ', ' '\n')
+          else
+            if [ -z "${BEFORE_SHA:-}" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+              changed=$(git show --name-only --pretty=format: "$AFTER_SHA")
+            else
+              changed=$(git diff --name-only "$BEFORE_SHA" "$AFTER_SHA")
+            fi
+            modules=$(printf '%s\n' "$changed" \
+              | sed -nE 's#^content/0*([0-9]+)-.*\.md$#\1#p; s#^assets/0*([0-9]+)/.*#\1#p')
+          fi
+          json=$(printf '%s\n' $modules \
+            | grep -E '^[0-9]+$' \
+            | awk '$1 >= 1 && $1 <= 7' \
+            | sort -un \
+            | paste -sd, -)
+          echo "modules=[$json]" >> "$GITHUB_OUTPUT"
+          echo "Affected modules: [$json]"
+
+      - name: Dispatch to legacy-app
+        if: steps.modules.outputs.modules != '[]'
+        env:
+          GH_TOKEN: ${{ secrets.LEGACY_APP_DISPATCH_TOKEN }}
+          ACC_SHA: ${{ github.sha }}
+          ACC_REF: ${{ github.ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_REASON: ${{ github.event.inputs.reason }}
+          MODULES_JSON: ${{ steps.modules.outputs.modules }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::LEGACY_APP_DISPATCH_TOKEN is not set; cannot dispatch to GeekTrainer/legacy-app." >&2
+            exit 1
+          fi
+          acc_version=$(date -u +%Y-%m)
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            reason="${MANUAL_REASON:-manual}"
+          else
+            reason="content-update"
+          fi
+          echo "$MODULES_JSON" | jq -r '.[]' | while read -r module; do
+            dispatch_id=$(cat /proc/sys/kernel/random/uuid)
+            payload=$(jq -n \
+              --arg sha "$ACC_SHA" \
+              --arg ref "$ACC_REF" \
+              --argjson module "$module" \
+              --arg version "$acc_version" \
+              --arg reason "$reason" \
+              --arg dispatch_id "$dispatch_id" \
+              '{event_type: "acc-content-changed", client_payload: {acc_sha: $sha, acc_ref: $ref, affected_module: $module, acc_version: $version, reason: $reason, dispatch_id: $dispatch_id}}')
+            echo "Dispatching acc-content-changed for module $module (dispatch_id=$dispatch_id)"
+            printf '%s' "$payload" | gh api -X POST /repos/GeekTrainer/legacy-app/dispatches --input -
+          done

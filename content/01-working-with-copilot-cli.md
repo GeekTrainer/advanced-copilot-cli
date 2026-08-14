@@ -18,6 +18,9 @@ In this lesson, you will learn:
 
 You're a developer who recently joined Contoso Industries and inherited **AssetTrack** — an internal asset-tracking application built on Java, Astro/TypeScript with React islands, .NET, and FastAPI. The app has incomplete documentation, many files, and a non-trivial bug list. Before changing anything, you want to understand what Copilot CLI is doing on your behalf, and develop the muscle memory for steering it.
 
+> [!NOTE]
+> Starting state: this is the first module, so there's no catch-up branch — work from the default branch of the AssetTrack fork you created in the [prerequisites][previous-lesson].
+
 ## Tech topics
 
 This module covers two foundational concepts:

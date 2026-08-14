@@ -19,7 +19,11 @@ By the end of this module you will be able to:
 Contoso has a set of best practices that need to be followed in every code change: stack-specific conventions, accessibility requirements (the organization is moving toward WCAG 2.2 AA), and a hard rule that every AI-generated change must flow through an issue and a pull request - no direct commits to main.
 
 > [!NOTE]
-> Starting state: your fork has the documentation updates from [Module 1][previous-lesson] merged.
+> Starting state: your fork has the documentation updates from [Module 1][previous-lesson] merged. If you're jumping in here, check out the catch-up branch that holds them:
+>
+> ```bash
+> git checkout start-of-module-02
+> ```
 
 ## Add custom instructions to Copilot CLI
 
