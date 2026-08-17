@@ -86,9 +86,7 @@ Module 1 starts from the pristine fork, so it has no catch-up branch, and there 
 
 ### Keeping the catch-up branches current
 
-The `start-of-module-N` branches live on `GeekTrainer/legacy-app`, which owns their generation, validation, and promotion. When this repository's module content or assets change on `main`, the [`notify-legacy-app` workflow][notify-workflow] sends a `repository_dispatch` (`acc-content-changed`) to `legacy-app` with the changed commit and affected module number, which triggers that repository's maintenance workflow behind its own approval gate.
-
-The dispatch requires a `LEGACY_APP_DISPATCH_TOKEN` repository secret authorized to POST dispatches to `legacy-app`. Use a fine-grained personal access token scoped to `GeekTrainer/legacy-app` only with **Contents: write** (classic equivalent: `repo` scope), or a GitHub App installation token as the longer-lived alternative — prefer the App if the setup cost is acceptable, and rotate a PAT per your organization's policy. The workflow fails closed with a clear error if the secret is absent.
+The `start-of-module-N` branches live on `GeekTrainer/legacy-app`, which owns their generation, validation, and promotion. `legacy-app` regenerates them by pulling this repository's public content on a schedule and on demand through a manual `workflow_dispatch`, then opens a pull request that a human reviews and approves before the branches move. This repository stays pure content — it publishes module updates and holds no automation that reaches into `legacy-app`.
 
 ## Status
 
@@ -104,4 +102,3 @@ This repository contains the **skeleton** for the course. Each module file captu
 [m06]: ./content/06-modernize-apps.md
 [m07]: ./content/07-manage-infrastructure.md
 [m08]: ./content/08-wrap-up.md
-[notify-workflow]: ./.github/workflows/notify-legacy-app.yml
