@@ -188,7 +188,7 @@ Use this mode when the user asks to build or refresh a module's produced state �
 
 ### Set up the branch and environment
 
-1. Clone the learner template repository, check out the module's catch-up branch `start-of-module-<N>` (the `NN-<slug>-solution` aliases still resolve), then create the produced-state branch off it: `git checkout -b start-of-module-<N+1>`.
+1. Clone the learner template repository, check out the module's catch-up branch `start-of-module-NN` (zero-padded two-digit, for example `start-of-module-04`; the `NN-<slug>-solution` aliases still resolve), then create the produced-state branch off it — the next module's zero-padded catch-up branch: `git checkout -b start-of-module-NN` (for example, running Module 4 produces `start-of-module-05`).
 2. Bring up the project devcontainer (`devcontainer up --workspace-folder <learner-root>`) and verify the toolchains inside it. Run every command and every Copilot prompt through `devcontainer exec`. Never build, test, or generate on the bare host — the polyglot stacks (Java, .NET, Python, Node, Maven, Playwright) usually only exist inside the container.
 
 ### Authenticate the nested Copilot CLI
@@ -248,7 +248,7 @@ The skill reads these named inputs from the invocation:
 |---|---|
 | `mode` | `validate` runs and verifies without emitting a patch series; `seed` runs, verifies, and emits the produced-state delta for promotion. |
 | `module` | Module number `1..7` whose content is executed. |
-| `base-ref` | Git ref in the learner repo to start from: `start-of-module-<module>` for `module >= 2`, or the pristine default branch / `acc-base` tag for `module == 1`. |
+| `base-ref` | Git ref in the learner repo to start from, passed verbatim by the caller: the zero-padded two-digit branch `start-of-module-NN` for `module >= 2` (for example `start-of-module-04`, never `start-of-module-4`), or the pristine default branch / `acc-base` tag for `module == 1`. Consume this value as given; never reconstruct the branch name from an unpadded `module` number. |
 | `acc-ref` | The `advanced-copilot-cli` commit SHA (or ref) to read the module content from. Checked out into the course root before the run. |
 | `repo` | Path to the learner repo checkout (`legacy-app`) where learner steps execute. All learner writes stay inside this path. |
 | `out` | Output directory for evidence, patches, and the result file. All review artifacts stay inside this path. |
@@ -263,8 +263,10 @@ The run must not write outside `repo` and `out` (plus `issues/` in the course ro
 3. Use stable, parameterized commit messages with no timestamps or volatile data:
 
    ```text
-   chore(seed): module <N> produced-state for start-of-module-<N+1> [acc:<acc-ref-short>]
+   chore(seed): module <N> produced-state for start-of-module-NN [acc:<acc-ref-short>]
    ```
+
+   The `start-of-module-NN` branch name is zero-padded two-digit (Module 4 produces `start-of-module-05`).
 
    Keep the `Co-authored-by: Copilot` trailer, because Copilot authored the artifacts.
 4. Emit patches with `git format-patch` in commit order so the series is reproducible and reviewable.
