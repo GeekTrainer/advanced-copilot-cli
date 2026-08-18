@@ -1,0 +1,37 @@
+name: awesome-copilot dry-run preview
+
+# Regenerates the awesome-copilot Learning Hub preview from content/ and uploads
+# it as an artifact. This is a LOCAL, OFFLINE preview only: it never contacts
+# github/awesome-copilot and never opens a pull request. The real publish is the
+# staged gh-aw workflow in publishing/advanced-copilot-cli-sync.md, which is
+# contributed upstream separately. See publishing/README.md.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "content/**"
+      - "scripts/awesome-copilot-dry-run.mjs"
+      - "publishing/**"
+      - ".github/workflows/awesome-copilot-dry-run.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # dry-run derives lastUpdated from git history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Generate preview
+        run: node scripts/awesome-copilot-dry-run.mjs --out "${RUNNER_TEMP}/preview"
+      - name: Upload preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: awesome-copilot-preview
+          path: ${{ runner.temp }}/preview
