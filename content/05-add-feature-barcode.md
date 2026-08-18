@@ -112,7 +112,7 @@ Now let's use `/research` to determine which library fits best for server-side Q
 1. In the same Copilot CLI session, run `/research` with a prompt that names the use case, the runtime constraint, and the decision criteria:
 
     ```text
-    /research Research a QR code generation library for AssetTrack's assets service (services/assets-svc, .NET 8). I need to generate a QR code image for an asset on the server. The service runs in a Linux container, so the library must not depend on native OS graphics such as System.Drawing. Compare the realistic options and recommend one. For each option, report the license, a maintenance signal (last release and activity), whether rendering is pure-managed, and the output formats it supports (PNG and SVG). End with a recommendation and a short integration sketch for services/assets-svc. Cite your sources.
+    /research Research a QR code generation library for AssetTrack's assets service (services/assets-svc, .NET 10). I need to generate a QR code image for an asset on the server. The service runs in a Linux container, so the library must not depend on native OS graphics such as System.Drawing. Compare the realistic options and recommend one. For each option, report the license, a maintenance signal (last release and activity), whether rendering is pure-managed, and the output formats it supports (PNG and SVG). End with a recommendation and a short integration sketch for services/assets-svc. Cite your sources.
     ```
 
 > [!NOTE]
