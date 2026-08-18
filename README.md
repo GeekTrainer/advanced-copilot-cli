@@ -80,7 +80,32 @@ The script pulls from the [course source repository][course-source-repo] and cop
 
 This repository contains the **skeleton** for the course. Each module file captures the structure, talking points, and exercise outlines. Full prose, screenshots, and step-by-step content will be filled in by the course authors.
 
+## License
+
+This project is licensed under the terms of the MIT license — see [`LICENSE`][license].
+
+## Contributing
+
+Contributions are welcome. See [`CONTRIBUTING.md`][contributing] for how to author and edit content, the pull request flow, and commit conventions.
+
+## Code of conduct
+
+This project has adopted a [Code of Conduct][code-of-conduct]. By participating, you agree to abide by its terms.
+
+## Support
+
+For help, questions, and how to file issues, see [`SUPPORT.md`][support].
+
+## Security
+
+To report a security vulnerability, follow the coordinated disclosure process in [`SECURITY.md`][security].
+
 [legacy-app]: https://github.com/geektrainer/legacy-app
+[license]: ./LICENSE
+[contributing]: ./CONTRIBUTING.md
+[code-of-conduct]: ./CODE_OF_CONDUCT.md
+[support]: ./SUPPORT.md
+[security]: ./SECURITY.md
 [m00]: ./content/00-prerequisites.md
 [m01]: ./content/01-working-with-copilot-cli.md
 [m02]: ./content/02-building-ai-infrastructure.md

@@ -1,0 +1,11 @@
+# Dependabot configuration for the Advanced Copilot CLI course content repo.
+# This repo hosts Markdown course content and has no application package manifest,
+# so only GitHub Actions workflows are tracked. Add an `npm` (or other) ecosystem
+# entry here if build tooling with a manifest is introduced later.
+# Learn more: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
