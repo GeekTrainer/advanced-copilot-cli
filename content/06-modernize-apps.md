@@ -124,7 +124,7 @@ Start with the code signal: install the Eclipse JDT language server through the 
     ```
 
 > [!NOTE]
-> The committed `.github/lsp.json` tells Copilot how to launch `jdtls`, but each environment still needs the server installed — that's what the `lsp-setup` skill does. A teammate who clones the repo runs the same skill once to install `jdtls` locally. It runs on Java 21, which the AssetTrack devcontainer provides alongside the Java 17 that `audit-svc` and `auth-svc` build on, and analyzes their Java 17 source without trouble.
+> The committed `.github/lsp.json` tells Copilot how to launch `jdtls`, but each environment still needs the server installed — that's what the `lsp-setup` skill does. A teammate who clones the repo runs the same skill once to install `jdtls` locally. It runs on the Java 21 JDK the AssetTrack devcontainer provides, which both builds `audit-svc` and `auth-svc` — they target Java 17 — and analyzes their source without trouble.
 
 9. To complete the installation, exit Copilot CLI by using the command `/exit`, then `/exit` again, then re-open Copilot by running `copilot --yolo`.
 
