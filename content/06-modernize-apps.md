@@ -167,8 +167,6 @@ The plan you'll drive the rest of the module from was produced by a real `/resea
 
 1. In your main session, have Copilot find the representative plan in the course repository and save it into your repo. Copilot CLI ships with the GitHub MCP server, so it can locate the file by repository and name rather than a brittle raw URL:
 
-    <!-- reconcile exact version with delta_06 build: the resource plan (content/resources/modernize-audit-svc.md in GeekTrainer/advanced-copilot-cli) must be regenerated for the Boot 3.5.16/Java 17 → Boot 4.1/Java 21 rewrite before this exercise ships -->
-
     ```text
     Using the built-in GitHub MCP server, find the audit-svc migration plan in the GeekTrainer/advanced-copilot-cli repository — it's the resource file under content/resources for modernizing audit-svc. Read its contents and save them to docs/modernization/audit-svc-plan.md in this repo. Save it as-is — don't summarize or reformat it.
     ```
@@ -250,10 +248,9 @@ Drive the upgrade through the saved plan, approving one phase at a time and read
     Modernize services/audit-svc following the guidelines provided in the agent, and give me a final status report at the end. The baseline test suite from the previous exercise is already in place, so confirm it passes and start from the toolchain phase.
     ```
 
-    Watch the agent work the loop: it bumps the `spring-boot-starter-parent` to Spring Boot 4.1 and the `java.version` from `17` to `21`, reconciles the Jackson 3 default that Boot 4 brings, and builds and tests after each phase. When the LSP is active, notice that it locates callers and symbols precisely rather than grepping.
-    <!-- reconcile exact version with delta_06 build: pin the precise Spring Boot 4.1 patch once the rewrite build confirms it -->
+    Watch the agent work the loop: it bumps the `spring-boot-starter-parent` to Spring Boot `4.1.0` and the `java.version` from `17` to `21`, re-points the `jackson-bom` currency pin at a CVE-clean Jackson 3 (Boot 4.1.0 otherwise resolves a still-vulnerable Jackson `3.1.4`), and builds and tests after each phase. When the LSP is active, notice that it locates callers and symbols precisely rather than grepping.
 
-3. Read the agent's testing status report. It should name the stack the service now targets — Java 21 and Spring Boot 4.1 — and confirm both layers ran and passed against it: the per-phase `audit-svc` unit and integration tests, and the final end-to-end suite.
+3. Read the agent's testing status report. It should name the stack the service now targets — Java 21 and Spring Boot 4.1.0 — and confirm both layers ran and passed against it: the per-phase `audit-svc` unit and integration tests, and the final end-to-end suite.
 
 ### Capture the playbook and update the agent
 
@@ -277,9 +274,7 @@ When you're done, `audit-svc` runs on Java 21 and Spring Boot 4.1, its tests are
 
 ## Exercise 5: Reuse the assets on the next service
 
-Modernizing the first service was the expensive part. The second one is where building assets pays off: the same agent and the same playbook are most of the work already done — and because the playbook already captured the recipe, you don't need a second research pass to rediscover it. `auth-svc` starts from the same Java 17 / Spring Boot 3.5 baseline as `audit-svc`, but it carries this module's real dependency-security lesson: it issues JWTs with the `jjwt` library, and under Spring Boot 4 `jjwt`'s serializer drags in a vulnerable transitive Jackson 2 — exactly the dependency the framework upgrade stops managing for you. Clearing it without regressing the clean baseline is the substance of this upgrade: bump `jjwt` from `0.11.5` to the `0.12.x` line and swap its `jjwt-jackson` serializer for `jjwt-gson`, whose CVE-clean Gson dependency removes Jackson 2 from `auth-svc` entirely.
-
-<!-- reconcile exact version with delta_06 build: confirm the precise jjwt 0.12.x and gson versions the rewrite build lands on -->
+Modernizing the first service was the expensive part. The second one is where building assets pays off: the same agent and the same playbook are most of the work already done — and because the playbook already captured the recipe, you don't need a second research pass to rediscover it. `auth-svc` starts from the same Java 17 / Spring Boot 3.5 baseline as `audit-svc`, but it carries this module's real dependency-security lesson: it issues JWTs with the `jjwt` library, and under Spring Boot 4 `jjwt`'s serializer drags in a vulnerable transitive Jackson 2 — exactly the dependency the framework upgrade stops managing for you. Clearing it without regressing the clean baseline is the substance of this upgrade: bump `jjwt` from `0.11.5` to `0.12.7` (its `-api`, `-impl`, and `-gson` artifacts) and swap the `jjwt-jackson` serializer for `jjwt-gson`, whose CVE-clean Gson dependency (`2.13.2`) removes Jackson 2 from `auth-svc` entirely.
 
 > [!TIP]
 > That difference is here on purpose. `auth-svc` isn't a clean re-run of `audit-svc`, and that's the point. It leans on an extra third-party library for its login tokens, and that library's transitive dependencies react to the Spring Boot 4 upgrade in a way `audit-svc`'s never do — small, realistic ways that no two services are ever quite alike. When the vulnerable-Jackson pull trips a build or a dependency check, you're watching the safety net do its job, not the agent coming apart. A red signal is a precise instruction you hand back to the agent — "this library pulled a vulnerable transitive," "swap the serializer to jjwt-gson" — and it adapts. That loop, where good prep plus a red result sharpens the next instruction, is exactly how better inputs produce better AI outcomes. Expect a little iteration on the second service, and read it as the process working rather than the agent misbehaving.

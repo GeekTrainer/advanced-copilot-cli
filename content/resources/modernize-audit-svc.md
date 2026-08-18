@@ -1,20 +1,19 @@
-# Migration plan: `audit-svc` from Spring Boot 3.5.16 / Java 17 to Spring Boot 4.1 / Java 21
-
-<!-- reconcile exact version with delta_06 build: the precise Spring Boot 4.1 patch, the resolved Jackson 3 version, and the fate of the Jackson 2 / Log4j2 currency pins are finalized by the legacy-app delta_06 rewrite build; floors below are known-good, pin the exact values once that build lands -->
+# Migration plan: `audit-svc` from Spring Boot 3.5.16 / Java 17 to Spring Boot 4.1.0 / Java 21
 
 ## 1. Executive summary
 
-`audit-svc` is a small, append-only audit-log microservice [currently on Spring Boot 3.5.16 / Java 17][pom-audit-L8], a generation behind the current supported line, [Spring Boot 4.1 / Java 21 (Spring Framework 7)][spring-boot-4-migration]. Its sibling [`workforce-svc` already runs on Java 21][pom-wf], so the runtime jump is well-trodden; the Spring Boot 4 major is the new work. The service uses only `spring-boot-starter-web`, `spring-boot-starter-jdbc`, raw `JdbcTemplate`, and `sqlite-jdbc` — [no JPA, no Hibernate, no `javax.*` imports, and no direct Jackson or JJWT usage][pom-audit-L25] — so this is the mechanical, low-risk service to modernize first. The mandatory changes are small: two edits in `pom.xml` plus a review of the existing currency pins, on top of a baseline test suite added first. The one shift that isn't a version number is that Spring Boot 4 defaults to [Jackson 3][jackson-3] and no longer manages Jackson 2, so the service's JSON serialization moves onto the Jackson 3 line; because `audit-svc` never touches Jackson types directly, that change is transparent to its code but must be verified. A hard organizational constraint frames the whole upgrade: no phase may introduce a known-vulnerable dependency.
+`audit-svc` is a small, append-only audit-log microservice [currently on Spring Boot 3.5.16 / Java 17][pom-audit-L8], a generation behind the current supported line, [Spring Boot 4.1.0 / Java 21 (Spring Framework 7)][spring-boot-4-migration]. Its sibling [`workforce-svc` already runs on Java 21][pom-wf], so the runtime jump is well-trodden; the Spring Boot 4 major is the new work. The service uses only `spring-boot-starter-web`, `spring-boot-starter-jdbc`, raw `JdbcTemplate`, and `sqlite-jdbc` — [no JPA, no Hibernate, no `javax.*` imports, and no direct Jackson or JJWT usage][pom-audit-L25] — so this is the mechanical, low-risk service to modernize first. The mandatory changes are small: two edits in `pom.xml` plus re-pointing the existing currency pins, on top of a baseline test suite added first. The one shift that isn't a version number is that Spring Boot 4 defaults to [Jackson 3][jackson-3] (the `tools.jackson` namespace) and no longer manages Jackson 2, so the service's JSON serialization moves onto the Jackson 3 line; because `audit-svc` never touches Jackson types directly that change is transparent to its code, but Boot 4.1.0 natively resolves a still-vulnerable Jackson `3.1.4`, so the `jackson-bom` pin has to be re-aimed at a clean `3.1.6` rather than dropped. A hard organizational constraint frames the whole upgrade: no phase may introduce a known-vulnerable dependency.
 
 ## 2. Current state vs. target state
 
 | Dimension | Current (`audit-svc`) | Target | Source |
 |---|---|---|---|
-| Spring Boot parent | `3.5.16` | `4.1.x` (latest) | [pom.xml L8][pom-audit-L8] → [migration guide][spring-boot-4-migration] |
-| Spring Framework | `6.2` | `7.0` | [Spring Framework 7 reference][spring-framework-7] |
+| Spring Boot parent | `3.5.16` | `4.1.0` | [pom.xml L8][pom-audit-L8] → [migration guide][spring-boot-4-migration] |
+| Spring Framework | `6.2` | `7.0.8` | [Spring Framework 7 reference][spring-framework-7] |
+| Embedded server | tomcat-embed-core `10.1` (Boot 3.5) | tomcat-embed-core `11.0.22` | [migration guide][spring-boot-4-migration] |
 | Java source/target | `17` | `21` | [pom.xml L19][pom-audit-L19] |
-| JSON binding | Jackson 2 (BOM-pinned `2.22.2`) | Jackson 3 (Boot 4 default) | [pom.xml L21][pom-audit-L21] → [Jackson 3][jackson-3] |
-| Currency pins | `jackson-bom 2.22.2`, `log4j2 2.25.5` | review under Boot 4 | [pom.xml L21–22][pom-audit-L21] |
+| JSON binding | Jackson 2 (BOM-pinned `2.22.2`) | Jackson 3, pinned `3.1.6` | [pom.xml L21][pom-audit-L21] → [Jackson 3][jackson-3] |
+| Currency pins | `jackson-bom 2.22.2`, `log4j2 2.25.5` | `jackson-bom 3.1.6`, `log4j2 2.25.5` (re-pinned) | [pom.xml L21–22][pom-audit-L21] |
 | Persistence | Raw `JdbcTemplate` + SQLite | unchanged | [AuditRepository.java][repo-audit] |
 | `javax.*` / Jackson / JJWT imports | None | N/A — no changes needed | all four `.java` files |
 | Tests | None | Baseline suite before migration | — |
@@ -23,8 +22,8 @@
 
 ### In scope
 
-- Bump the Spring Boot parent from `3.5.16` to the latest `4.1.x` and Java from `17` to `21`.
-- Reconcile the Jackson 2 → Jackson 3 default: confirm Boot 4 resolves a CVE-clean Jackson 3 (`≥ 3.1.5`) for the service's JSON, and review whether the `jackson-bom` and `log4j2` currency pins are still needed, need updating, or should be removed now that Boot 4 manages a different baseline.
+- Bump the Spring Boot parent from `3.5.16` to `4.1.0` and Java from `17` to `21`.
+- Re-point the currency pins for Boot 4: because Boot `4.1.0` natively resolves a still-vulnerable Jackson `3.1.4` and Log4j2 `2.25.4`, keep both pins but re-aim `<jackson-bom.version>` at Jackson 3 `3.1.6` and hold `<log4j2.version>` at `2.25.5`, then confirm the tree is CVE-clean.
 - Align the toolchain references (IDE metadata) with the new runtime.
 - Add a baseline test suite *before* any framework change, so regressions are detectable.
 
@@ -43,7 +42,7 @@
 
 ### Direct version jump is appropriate
 
-The [Spring Boot migration guidance][spring-boot-4-migration] is to be on the latest 3.5.x before upgrading to 4.x. `audit-svc` is already on `3.5.16`, a current 3.5 maintenance release, so a direct jump to the latest `4.1.x` keeps the service on a single, supported baseline. The phases below still isolate the Java/toolchain change from the framework bump so each step is independently verifiable.
+The [Spring Boot migration guidance][spring-boot-4-migration] is to be on the latest 3.5.x before upgrading to 4.x. `audit-svc` is already on `3.5.16`, a current 3.5 maintenance release, so a direct jump to `4.1.0` keeps the service on a single, supported baseline. The phases below still isolate the Java/toolchain change from the framework bump so each step is independently verifiable.
 
 ## 4. Phased migration plan
 
@@ -102,11 +101,11 @@ The [Spring Boot migration guidance][spring-boot-4-migration] is to be on the la
 
 **Exit criteria:** proceed when the Phase 0 tests still pass under Java 21 on Boot 3.5.16. Boot 3.5 on Java 21 is a supported combination `workforce-svc` already runs, so this phase should be green with no code changes.
 
-### Phase 2 — Spring Boot parent bump to 4.1.x (core phase)
+### Phase 2 — Spring Boot parent bump to 4.1.0 (core phase)
 
-**Goal:** bump the Spring Boot parent to the latest `4.1.x`, confirm dependencies resolve, reconcile the Jackson 3 default and the currency pins, and run the full suite.
+**Goal:** bump the Spring Boot parent to `4.1.0`, confirm dependencies resolve, re-point the currency pins onto CVE-clean Jackson 3 and Log4j2, and run the full suite.
 
-1. In [`services/audit-svc/pom.xml`][pom-audit-L8], change the parent `<version>` from `3.5.16` to the latest `4.1.x`:
+1. In [`services/audit-svc/pom.xml`][pom-audit-L8], change the parent `<version>` from `3.5.16` to `4.1.0`:
 
     ```xml
     <parent>
@@ -117,13 +116,9 @@ The [Spring Boot migration guidance][spring-boot-4-migration] is to be on the la
     </parent>
     ```
 
-    <!-- reconcile exact version with delta_06 build: replace 4.1.0 with the exact 4.1.x patch the rewrite build validates -->
-
     That plus the `java.version` already set in Phase 1 are the core edits. The three application dependencies (`spring-boot-starter-web`, `spring-boot-starter-jdbc`, `sqlite-jdbc 3.45.3.0`) all work under Boot 4.
 
-2. Reconcile the Jackson change. Spring Boot 4 defaults to [Jackson 3][jackson-3] (the `tools.jackson` namespace) and no longer manages Jackson 2, so the [`jackson-bom` pin at L21][pom-audit-L21] no longer governs the JSON path the way it did on Boot 3.5. Confirm Boot 4 resolves a CVE-clean Jackson 3 (`≥ 3.1.5`) via `mvn dependency:tree`, then decide the pin's fate: remove it if nothing in the tree still needs Jackson 2, or update it if a transitive still resolves a Jackson 2 that must stay clean. Apply the same review to the [`log4j2` pin at L22][pom-audit-L21] against Boot 4's managed Log4j2 version.
-
-    <!-- reconcile exact version with delta_06 build: confirm the resolved Jackson 3 version and whether the jackson-bom / log4j2 pins are dropped or updated -->
+2. Re-point the currency pins. Spring Boot 4 defaults to [Jackson 3][jackson-3] (the `tools.jackson` namespace) and no longer manages Jackson 2, but Boot `4.1.0` natively resolves a still-vulnerable Jackson `3.1.4`, so the [`jackson-bom` pin at L21][pom-audit-L21] stays — re-aimed at a CVE-clean Jackson 3 `3.1.6`. Likewise Boot `4.1.0` pulls a vulnerable Log4j2 `2.25.4`, so keep the [`log4j2` pin at L22][pom-audit-L21] at `2.25.5`. Confirm the result with `mvn dependency:tree`: the tree should show Jackson `3.1.6` and Log4j2 `2.25.5` and no known-vulnerable package.
 
 3. Optionally add `spring-boot-properties-migrator` (runtime scope) for this phase only, to catch any [renamed configuration keys][spring-boot-4-migration], then remove it before committing. `audit-svc`'s `application.properties` has only three stable keys (`server.port`, `spring.datasource.url`, `spring.datasource.driver-class-name`), so the migrator is a safety net rather than a necessity.
 
@@ -173,8 +168,8 @@ If a future decision moves `audit-svc` from `JdbcTemplate` to Spring Data JPA fo
 | File | Phase | Change | Before | After |
 |---|---|---|---|---|
 | [`audit-svc/pom.xml` L19][pom-audit-L19] | 1 | Edit | `<java.version>17</java.version>` | `<java.version>21</java.version>` |
-| [`audit-svc/pom.xml` L8][pom-audit-L8] | 2 | Edit | `<version>3.5.16</version>` | `<version>4.1.x</version>` |
-| [`audit-svc/pom.xml` L21–22][pom-audit-L21] | 2 | Review | `jackson-bom 2.22.2`, `log4j2 2.25.5` | drop or update under Boot 4 / Jackson 3 |
+| [`audit-svc/pom.xml` L8][pom-audit-L8] | 2 | Edit | `<version>3.5.16</version>` | `<version>4.1.0</version>` |
+| [`audit-svc/pom.xml` L21–22][pom-audit-L21] | 2 | Re-pin | `jackson-bom 2.22.2`, `log4j2 2.25.5` | `jackson-bom 3.1.6` (Jackson 3), `log4j2 2.25.5` |
 | [`audit-svc/pom.xml` L25–39][pom-audit-L25] | 0 | Add | *(no test dep)* | `spring-boot-starter-test` (`test` scope) |
 | `audit-svc/src/**/*.java` | — | No change | no `javax` / Jackson / JJWT imports | no changes needed |
 | `audit-svc/.../application.properties` | — | No change | 3 stable keys | no changes needed |
@@ -186,8 +181,8 @@ If a future decision moves `audit-svc` from `JdbcTemplate` to Spring Data JPA fo
 | R1 | No existing tests — regressions invisible | High (confirmed) | High | Pre-0 | Add the baseline suite in Phase 0 before any change |
 | R2 | Boot 4 major changes a default that alters runtime behavior | Medium | High | 2 | Baseline tests + read the [Boot 4 migration guide][spring-boot-4-migration]; add shifted defaults as explicit checks |
 | R3 | Jackson 3 default serializes differently than Jackson 2 | Low (plain records/maps) | Medium | 2 | Assert JSON responses in Phase 0; compare before/after |
-| R4 | A transitive still resolves a vulnerable Jackson 2 after the bump | Low (no direct Jackson use) | High | 2 | `mvn dependency:tree`; drop/keep the `jackson-bom` pin accordingly |
-| R5 | Currency pins (`jackson-bom`, `log4j2`) conflict with Boot 4's managed versions | Medium | Medium | 2 | Review and reconcile both pins; re-run `dependency:tree` |
+| R4 | Boot `4.1.0` natively resolves a vulnerable Jackson `3.1.4` and Log4j2 `2.25.4` | High (confirmed) | High | 2 | Keep the currency pins, re-aimed at Jackson `3.1.6` / Log4j2 `2.25.5`; verify with `dependency:tree` |
+| R5 | Boot 4 moved `TestRestTemplate` to `spring-boot-restclient-test` | Medium | Medium | 0/2 | Use `@LocalServerPort` + `RestClient` (or `MockMvc`) for HTTP-level tests; add the `spring-boot-restclient-test` dependency if `TestRestTemplate` is still needed |
 | R6 | IDE shows false Java 17 errors after the pom change | Medium | Low | 1 | Update the locally generated `.classpath`/`.settings` |
 | R7 | `last_insert_rowid()` wrong under concurrency | Medium (pre-existing) | Medium | 3 | Load test; pool-size=1 or single-connection wrapper |
 | R8 | SQL injection in `search()` | High (intentional) | High | Out of scope | Track as a separate issue; keep it out of the migration |
@@ -209,10 +204,10 @@ If a future decision moves `audit-svc` from `JdbcTemplate` to Spring Data JPA fo
 
 **Phase 2 — framework**
 
-- [ ] `pom.xml` parent set to the latest `4.1.x`
+- [ ] `pom.xml` parent set to `4.1.0`
 - [ ] `mvn dependency:tree` shows no resolution failures and a CVE-clean Jackson 3
-- [ ] `jackson-bom` / `log4j2` currency pins reviewed and reconciled
-- [ ] `mvn verify` — all baseline tests pass on Java 21 / Boot 4.1
+- [ ] `jackson-bom` re-pinned to Jackson `3.1.6`, `log4j2` held at `2.25.5`; tree CVE-clean
+- [ ] `mvn verify` — all baseline tests pass on Java 21 / Boot 4.1.0
 - [ ] Endpoints respond: `GET /health`, `POST /events`, `GET /events`
 
 **Phase 3 — stabilization**
