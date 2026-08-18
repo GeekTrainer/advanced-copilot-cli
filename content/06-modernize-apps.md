@@ -165,12 +165,12 @@ Treat the result as evidence, not as the decision. The upgrade touches real thin
 
 The plan you'll drive the rest of the module from was produced by a real `/research` run — the research prompt in the tip below, pointed at `audit-svc` — and then trimmed so Copilot can consult it without re-reading a 700-line report every time it needs the recipe. It's a representative artifact: citation-backed, phased, and grounded in the actual `legacy-app` source. You'll pull it into the repo now so it becomes the first reusable asset of the modernization, then verify it before it drives any code.
 
-1. In your main session, have Copilot fetch the representative plan and save it into the repo:
+1. In your main session, have Copilot find the representative plan in the course repository and save it into your repo. Copilot CLI ships with the GitHub MCP server, so it can locate the file by repository and name rather than a brittle raw URL:
 
-    <!-- reconcile exact version with delta_06 build: the gist at this URL must be regenerated for the Boot 3.5.16/Java 17 → Boot 4.1/Java 21 rewrite before this exercise ships -->
+    <!-- reconcile exact version with delta_06 build: the resource plan (content/resources/modernize-audit-svc.md in GeekTrainer/advanced-copilot-cli) must be regenerated for the Boot 3.5.16/Java 17 → Boot 4.1/Java 21 rewrite before this exercise ships -->
 
     ```text
-    Fetch the migration plan at https://gist.githubusercontent.com/GeekTrainer/00dfb887073bf1c95dfcec307172ac93/raw/audit-svc-plan.md and save it to docs/modernization/audit-svc-plan.md in this repo. Save it as-is — don't summarize or reformat it.
+    Using the built-in GitHub MCP server, find the audit-svc migration plan in the GeekTrainer/advanced-copilot-cli repository — it's the resource file under content/resources for modernizing audit-svc. Read its contents and save them to docs/modernization/audit-svc-plan.md in this repo. Save it as-is — don't summarize or reformat it.
     ```
 
 2. Open `docs/modernization/audit-svc-plan.md` and read the phases. Check it against the ground truth so you trust it before it drives code: it names a specific Spring Boot 4.1 parent rather than a generic "4.x", it accounts for the Jackson 2→3 default that Spring Boot 4 brings, and it keeps the existing `JdbcTemplate` data access rather than folding a JPA rewrite into the upgrade. Verify a couple of the cited links resolve. This is the contract the migrator agent works against, so if any phase reads too vaguely to hand to a teammate, ask Copilot to deepen it — ambiguity here becomes drift later.
