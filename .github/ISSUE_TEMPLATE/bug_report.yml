@@ -1,0 +1,45 @@
+name: Content Issue
+description: Report an error, unclear instruction, or broken step in the course content
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a content issue! Please fill out the information below so we can investigate.
+  - type: input
+    id: module
+    attributes:
+      label: Which module
+      description: The module file or title where you hit the issue (e.g. `content/03-test-suite-remote-delegation.md`).
+      placeholder: content/NN-short-slug.md
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What was unclear or incorrect
+      description: A clear and concise description of the problem with the content.
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Where in the module
+      description: Point us to the section, heading, step, or command so we can find it quickly.
+      placeholder: |
+        - Section: "Building the test suite"
+        - Step or command: ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual instruction
+      description: What did you expect the content to say or do, and what did it say or do instead?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that helps — terminal output (as text, not a screenshot), environment details, or links.
