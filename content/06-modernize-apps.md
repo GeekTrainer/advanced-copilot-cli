@@ -22,9 +22,9 @@ By the end of this module you will be able to:
 
 ## Scenario
 
-AssetTrack is a polyglot system, and two of its services have aged badly. `audit-svc` and `auth-svc` both run on Java 11 and Spring Boot 2.7 — a framework generation whose open-source support ended in 2023 — while the newer `workforce-svc` already runs on Java 21 and Spring Boot 3.5. Every month those two services sit on the old stack, the security backlog grows and the gap between "how we used to build services" and "how we build them now" widens. The mandate is to close it: bring the legacy services onto the same runtime and framework generation the rest of the team already targets.
+AssetTrack is a polyglot system, and two of its Java services are a generation behind. `audit-svc` and `auth-svc` both run on Java 17 and Spring Boot 3.5 — a supported but no-longer-current generation — while the platform's target is the current supported generation, Java 21 and Spring Boot 4.1. The services aren't vulnerable today: their dependencies are pinned to CVE-clean versions, and the hard rule is that no branch of this upgrade may ship a known-vulnerable package. But staying a generation back means missing the current framework's defaults, its language and runtime features, and the security posture that comes from tracking the latest supported line. The mandate is to bring them forward onto the current runtime and framework generation without ever regressing that clean dependency baseline.
 
-You won't do both at once. You'll modernize `audit-svc` first because it's the smaller, better-bounded service — it has no security-token code and, as you'll confirm, no `javax` imports of its own to rewrite — so you can learn the shape of the work with fewer moving parts. Then you'll turn what you learn into assets — a migrator agent and a written playbook — that make `auth-svc` a repeat rather than a fresh start. `workforce-svc` is your reference for what "done" looks like: when `audit-svc` matches its Java version and Spring Boot version and still passes its tests, the upgrade is complete.
+You won't do both at once. You'll modernize `audit-svc` first because it's the smaller, better-bounded service — it has no security-token code and no third-party JSON or JWT dependencies — so the upgrade is close to mechanical and you can learn the shape of the work with fewer moving parts. Then you'll turn what you learn into assets — a migrator agent and a written playbook — that make `auth-svc` a repeat rather than a fresh start. `auth-svc` is where the real dependency-security lesson lives: its `jjwt` token library drags a vulnerable transitive Jackson 2 under Spring Boot 4, and clearing that is the centerpiece of the second upgrade. `workforce-svc` already runs on Java 21, so the runtime jump is well-trodden ground; the Spring Boot 4 major is new ground for all of them.
 
 > [!NOTE]
 > **Starting state**: your fork has the AI infrastructure from earlier modules in place — custom instructions, the `Accessibility Expert` agent, the [`make-repo-contribution` skill][m02] you built earlier, and the [lifecycle hooks][m04] you added. If you're jumping in here, check out the catch-up branch that holds them:
@@ -72,7 +72,7 @@ Before Copilot makes upgrade changes, it needs a strong signal about both the co
 
 A **[Language Server Protocol (LSP)][copilot-cli-lsp-concept]** server gives Copilot structured code intelligence — go-to-definition, find-references, hover types, workspace symbol search — from the language's own analyzer rather than from text matching. On a modernization that precision matters: when Copilot needs to know every caller of a method whose signature changed, or whether a renamed symbol is fully rewired, an LSP answers from the compiler's model of the code, and it does so with compact structured results instead of reading whole files into the conversation. Copilot CLI uses a configured LSP automatically whenever one is available for the language in play.
 
-2. **An MCP server** extends what Copilot can *do*; a documentation MCP server points that extension at first-party docs. [Model Context Protocol (MCP)][mcp-concept] is an open standard for giving a model access to external tools and data, and Copilot CLI ships with the GitHub MCP server built in. For a Spring Boot and Jakarta EE upgrade the documentation that matters is the frameworks' own, and the most direct way to reach it is [GitMCP][gitmcp], an open-source server that turns any public GitHub repository into a documentation surface. Point it at `spring-projects/spring-boot` and Copilot reads Spring's own docs straight from the source, with no account or API key — and because it's open source you can self-host it. Pointing Copilot at a live docs surface is what keeps its framework claims tied to current guidance instead of whatever version happened to be current when its training data was frozen. For a framework major upgrade where the whole point is that things changed, that freshness is the difference between advice you can trust and advice you have to re-verify by hand.  
+2. **An MCP server** extends what Copilot can *do*; a documentation MCP server points that extension at first-party docs. [Model Context Protocol (MCP)][mcp-concept] is an open standard for giving a model access to external tools and data, and Copilot CLI ships with the GitHub MCP server built in. For a Spring Boot major upgrade the documentation that matters is the frameworks' own, and the most direct way to reach it is [GitMCP][gitmcp], an open-source server that turns any public GitHub repository into a documentation surface. Point it at `spring-projects/spring-boot` and Copilot reads Spring's own docs straight from the source, with no account or API key — and because it's open source you can self-host it. Pointing Copilot at a live docs surface is what keeps its framework claims tied to current guidance instead of whatever version happened to be current when its training data was frozen. For a framework major upgrade where the whole point is that things changed, that freshness is the difference between advice you can trust and advice you have to re-verify by hand.  
 
 ### Where LSP and MCP configuration live
 
@@ -124,7 +124,7 @@ Start with the code signal: install the Eclipse JDT language server through the 
     ```
 
 > [!NOTE]
-> The committed `.github/lsp.json` tells Copilot how to launch `jdtls`, but each environment still needs the server installed — that's what the `lsp-setup` skill does. A teammate who clones the repo runs the same skill once to install `jdtls` locally. It runs on Java 21, which the AssetTrack devcontainer provides alongside Java 11, and analyzes the Java 11 source in `audit-svc` and `auth-svc` without trouble.
+> The committed `.github/lsp.json` tells Copilot how to launch `jdtls`, but each environment still needs the server installed — that's what the `lsp-setup` skill does. A teammate who clones the repo runs the same skill once to install `jdtls` locally. It runs on the Java 21 JDK the AssetTrack devcontainer provides, which both builds `audit-svc` and `auth-svc` — they target Java 17 — and analyzes their source without trouble.
 
 9. To complete the installation, exit Copilot CLI by using the command `/exit`, then `/exit` again, then re-open Copilot by running `copilot --yolo`.
 
@@ -144,7 +144,7 @@ Now add the framework signal: register GitMCP, pointed at Spring Boot's own repo
 5. Select <kbd>Esc</kbd> to exit the MCP configuration screen.
 
 > [!TIP]
-> GitMCP serves whatever documentation a repository publishes — a project's `llms.txt` if it has one, otherwise its in-repo reference docs and README — so it's only as good as the source repo. If an answer comes back thin, point it at a more documentation-rich repository, add a second GitMCP server for another library (for example a Jakarta EE repository), or use the dynamic `https://gitmcp.io/docs` endpoint and name the repository in your prompt.
+> GitMCP serves whatever documentation a repository publishes — a project's `llms.txt` if it has one, otherwise its in-repo reference docs and README — so it's only as good as the source repo. If an answer comes back thin, point it at a more documentation-rich repository, add a second GitMCP server for another library (for example the Jackson repository, which matters for the Spring Boot 4 JSON change), or use the dynamic `https://gitmcp.io/docs` endpoint and name the repository in your prompt.
 
 GitMCP for Spring Boot is now registered, so Copilot can pull Spring Boot's own documentation on demand as it plans and applies the upgrade.
 
@@ -156,7 +156,7 @@ A framework major upgrade is exactly the kind of decision `/research` exists to 
 
 A good research prompt for a migration names the service, the current stack, the target, and the specific decisions the plan has to make — the runtime jump, the framework version, the namespace change, the data-access approach — and asks for phases and risks rather than a yes/no answer. A weak prompt ("how do I upgrade this?") gives the agent nothing to optimize against, and the report drifts toward a generic checklist. Because the research agent works autonomously and documents its assumptions rather than stopping to ask, the more constraints you give it up front, the more useful the report.
 
-Treat the result as evidence, not as the decision. The upgrade touches real things: Spring Boot 3 raises the minimum Java version, so the runtime and the framework move together; the move to [Jakarta EE 9][jakarta-ee-9] renamed the `javax.*` APIs to `jakarta.*`, so any affected imports have to change; and matching `workforce-svc` means the runtime and framework generation, not the data layer — so keep `audit-svc`'s working `JdbcTemplate` code in this upgrade and record the larger move to [Spring Data JPA][spring-data-jpa] as a separate follow-on rather than smuggling a rewrite into a framework bump. A good report will surface each of these with a source; your job is to confirm the sources are real and current before you let the plan drive code.
+Treat the result as evidence, not as the decision. The upgrade touches real things: Spring Boot 4 builds on [Spring Framework 7][spring-framework-7] and raises the minimum Java version, so the runtime and the framework move together; Spring Boot 4 defaults to [Jackson 3][jackson-3] — the new `tools.jackson` namespace — and no longer manages Jackson 2, so anything still resolving a Jackson 2 artifact needs a deliberate decision rather than a silent transitive pull; and the target is the current framework generation, not a data-layer rewrite — so keep `audit-svc`'s working `JdbcTemplate` code in this upgrade and record the larger move to [Spring Data JPA][spring-data-jpa] as a separate follow-on rather than smuggling a rewrite into a framework bump. A good report will surface each of these with a source; your job is to confirm the sources are real and current before you let the plan drive code.
 
 > [!NOTE]
 > The riskiest part of a major upgrade is often the changes in default behavior, not renames and versions. A new major version can silently alter how the framework behaves out of the box, so code that never changed starts doing something different, and the failure shows up at runtime with no obvious link to anything you edited. That's why default behavior belongs in your research up front: a shifted default is far cheaper to surface in a report and hand to the agent as an explicit constraint than to debug in a failing service later. A research pass that digs to this depth takes real time and reads dozens of sources, which is exactly why the plan in the next exercise was produced once and captured as a reusable asset rather than regenerated live.
@@ -165,22 +165,22 @@ Treat the result as evidence, not as the decision. The upgrade touches real thin
 
 The plan you'll drive the rest of the module from was produced by a real `/research` run — the research prompt in the tip below, pointed at `audit-svc` — and then trimmed so Copilot can consult it without re-reading a 700-line report every time it needs the recipe. It's a representative artifact: citation-backed, phased, and grounded in the actual `legacy-app` source. You'll pull it into the repo now so it becomes the first reusable asset of the modernization, then verify it before it drives any code.
 
-1. In your main session, have Copilot fetch the representative plan and save it into the repo:
+1. In your main session, have Copilot find the representative plan in the course repository and save it into your repo. Copilot CLI ships with the GitHub MCP server, so it can locate the file by repository and name rather than a brittle raw URL:
 
     ```text
-    Fetch the migration plan at https://gist.githubusercontent.com/GeekTrainer/00dfb887073bf1c95dfcec307172ac93/raw/audit-svc-plan.md and save it to docs/modernization/audit-svc-plan.md in this repo. Save it as-is — don't summarize or reformat it.
+    Using the built-in GitHub MCP server, find the audit-svc migration plan in the GeekTrainer/advanced-copilot-cli repository — it's the resource file under content/resources for modernizing audit-svc. Read its contents and save them to docs/modernization/audit-svc-plan.md in this repo. Save it as-is — don't summarize or reformat it.
     ```
 
-2. Open `docs/modernization/audit-svc-plan.md` and read the phases. Check it against the ground truth so you trust it before it drives code: it targets the same `3.5.3` parent that `workforce-svc` uses rather than a generic "3.x", it confirms `audit-svc`'s own code has no `javax` imports to change, and it keeps the existing `JdbcTemplate` data access rather than folding a JPA rewrite into the upgrade. Verify a couple of the cited links resolve. This is the contract the migrator agent works against, so if any phase reads too vaguely to hand to a teammate, ask Copilot to deepen it — ambiguity here becomes drift later.
+2. Open `docs/modernization/audit-svc-plan.md` and read the phases. Check it against the ground truth so you trust it before it drives code: it names a specific Spring Boot 4.1 parent rather than a generic "4.x", it accounts for the Jackson 2→3 default that Spring Boot 4 brings, and it keeps the existing `JdbcTemplate` data access rather than folding a JPA rewrite into the upgrade. Verify a couple of the cited links resolve. This is the contract the migrator agent works against, so if any phase reads too vaguely to hand to a teammate, ask Copilot to deepen it — ambiguity here becomes drift later.
 
 > [!TIP]
 > Want to see how the plan was produced? Generate your own! Type `/research`, then paste the prompt that names the service, the current and target stacks, and the decisions the plan must make. Do keep in mind it will take roughly 30 minutes for the research to complete.
 >
 > ```text
-> I need to modernize the audit-svc service in this repo. It currently runs on Java 11 and Spring Boot 2.7.18 with raw JDBC (JdbcTemplate) over SQLite. The target is to match workforce-svc, which runs on Java 21 and Spring Boot 3.5.3. Produce a phased migration plan. For each phase cover: the exact changes (the spring-boot-starter-parent version bump to match workforce-svc, the java.version bump to 21, whether any javax imports need to move to jakarta, and confirmation that the existing JdbcTemplate data access stays as-is for this upgrade with any move to Spring Data JPA called out only as an optional follow-on), the order to do them in, how to validate each phase, and the risks. Cite the official Spring Boot 3 migration guide and Jakarta EE sources.
+> I need to modernize the audit-svc service in this repo. It currently runs on Java 17 and Spring Boot 3.5.16 with raw JDBC (JdbcTemplate) over SQLite, with jackson-bom and log4j2 pinned to CVE-clean versions. The target is the current supported generation: Java 21 and Spring Boot 4.1 (Spring Framework 7). Produce a phased migration plan. For each phase cover: the exact changes (the spring-boot-starter-parent version bump to the latest Spring Boot 4.1, the java.version bump from 17 to 21, how the Spring Boot 4 default of Jackson 3 affects this service, and confirmation that the existing JdbcTemplate data access stays as-is for this upgrade with any move to Spring Data JPA called out only as an optional follow-on), the order to do them in, how to validate each phase, and the risks. A hard constraint: no phase may introduce a known-vulnerable dependency. Cite the official Spring Boot 4 migration guide and Jackson 3 sources.
 > ```
 >
-> The research runs for several minutes while the agent reads the code and the official Spring Boot and Jakarta guides on the web — it won't stop to ask questions, it records its findings in the report. When it finishes, save it with `/share file research docs/modernization/audit-svc-plan.md`. Your report will be longer and more heavily footnoted than the trimmed version you downloaded, but the decisions and the shape will be the same.
+> The research runs for several minutes while the agent reads the code and the official Spring Boot and Jackson guides on the web — it won't stop to ask questions, it records its findings in the report. When it finishes, save it with `/share file research docs/modernization/audit-svc-plan.md`. Your report will be longer and more heavily footnoted than the trimmed version you downloaded, but the decisions and the shape will be the same.
 
 ## Creating a test safety net
 
@@ -191,7 +191,7 @@ Two layers of tests catch different failures, and a real upgrade wants both:
 - **Regression tests at the service** — unit and integration tests that exercise `audit-svc`'s endpoints and its data access. These are the inner loop: they run in seconds after every phase and pinpoint the exact change that broke a behavior, so a regression is fixed against the phase that caused it rather than untangled ten phases later.
 - **End-to-end tests across the system** — a [Playwright suite you built earlier][m03] that drives AssetTrack through the UI. A framework major can leave a service's own tests green while breaking how it integrates with the rest of the system; the e2e layer is the outer net that catches a contract that shifted at the seams.
 
-The catch is that `audit-svc` has no tests today, which is common for exactly the services most in need of modernizing. So the first move isn't the upgrade — it's building enough of a net to make the upgrade observable. You capture the current behavior *before* you change the framework, so the tests describe "what `audit-svc` does on Spring Boot 2.7," and then hold that description constant as you move it to 3.5. Tests written after an upgrade only prove the new code is self-consistent; tests written before it prove you didn't change behavior on the way.
+The catch is that `audit-svc` has no tests today, which is common for exactly the services most in need of modernizing. So the first move isn't the upgrade — it's building enough of a net to make the upgrade observable. You capture the current behavior *before* you change the framework, so the tests describe "what `audit-svc` does on Spring Boot 3.5," and then hold that description constant as you move it to 4.1. Tests written after an upgrade only prove the new code is self-consistent; tests written before it prove you didn't change behavior on the way.
 
 > [!TIP]
 > Writing characterization tests against the old version first is what makes a modernization safe to hand to an agent at all. The tests become the specification the agent has to keep satisfying, which turns "trust me, the upgrade is fine" into a green suite anyone can rerun.
@@ -203,12 +203,12 @@ Now put that into practice: capture `audit-svc`'s current behavior in tests *bef
 1. Still in your main session, have Copilot add the tests and run them, so the safety net is green before anything changes:
 
     ```text
-    audit-svc has no tests. Before we modernize it, add a safety net that captures its current behavior. Add a Spring Boot context-load test like workforce-svc's WorkforceApplicationTests, plus integration tests that exercise the AuditController endpoints and the AuditRepository queries and assert the current JSON responses. Configure the tests to use an isolated temporary SQLite database instead of the real AUDIT_DB_PATH so they don't touch /data/audit.db. Then run them with scripts/with-java11 mvn test from services/audit-svc and confirm they pass on the current Spring Boot 2.7 code before we change anything.
+    audit-svc has no tests. Before we modernize it, add a safety net that captures its current behavior. Add a Spring Boot context-load test like workforce-svc's WorkforceApplicationTests, plus integration tests that exercise the AuditController endpoints and the AuditRepository queries and assert the current JSON responses. Configure the tests to use an isolated temporary SQLite database instead of the real AUDIT_DB_PATH so they don't touch /data/audit.db. Then run them with mvn test from services/audit-svc and confirm they pass on the current Spring Boot 3.5 code before we change anything.
     ```
 
 2. Confirm Copilot reports the suite passing against the *old* version. This is the baseline: if the upgrade changes behavior, these are the tests that will tell you.
 
-When you're done, `audit-svc` has a green safety net on Spring Boot 2.7 — the behavioral baseline the migrator agent has to keep satisfying phase by phase.
+When you're done, `audit-svc` has a green safety net on Spring Boot 3.5 — the behavioral baseline the migrator agent has to keep satisfying phase by phase.
 
 ## Driving the upgrade with a custom migrator agent
 
@@ -248,9 +248,9 @@ Drive the upgrade through the saved plan, approving one phase at a time and read
     Modernize services/audit-svc following the guidelines provided in the agent, and give me a final status report at the end. The baseline test suite from the previous exercise is already in place, so confirm it passes and start from the toolchain phase.
     ```
 
-    Watch the agent work the loop: it bumps the `spring-boot-starter-parent` to `3.5.3` and the `java.version` to `21`, and builds and tests after each phase. When the LSP is active, notice that it locates callers and symbols precisely rather than grepping.
+    Watch the agent work the loop: it bumps the `spring-boot-starter-parent` to Spring Boot `4.1.0` and the `java.version` from `17` to `21`, re-points the `jackson-bom` currency pin at a CVE-clean Jackson 3 (Boot 4.1.0 otherwise resolves a still-vulnerable Jackson `3.1.4`), and builds and tests after each phase. When the LSP is active, notice that it locates callers and symbols precisely rather than grepping.
 
-3. Read the agent's testing status report. It should name the stack the service now targets — Java 21 and Spring Boot 3.5.3 — and confirm both layers ran and passed against it: the per-phase `audit-svc` unit and integration tests, and the final end-to-end suite.
+3. Read the agent's testing status report. It should name the stack the service now targets — Java 21 and Spring Boot 4.1.0 — and confirm both layers ran and passed against it: the per-phase `audit-svc` unit and integration tests, and the final end-to-end suite.
 
 ### Capture the playbook and update the agent
 
@@ -270,20 +270,20 @@ As highlighted previously, app modernization follows a cycle of research, coding
 
 3. Review the newly generated `migration-playbook.md` and updated `java-migrator.agent.md` files, making any changes you believe are necessary for clarity's sake.
 
-When you're done, `audit-svc` runs on Java 21 and Spring Boot 3.5.3, its tests are green, and it no longer depends on the Java 11 wrapper — and you've produced four assets that outlast this one service: the `Java migrator` agent, the saved plan, the playbook, and a test router that now guards the modernized service.
+When you're done, `audit-svc` runs on Java 21 and Spring Boot 4.1, its tests are green, and it has moved a full generation forward from Java 17 / Spring Boot 3.5 — and you've produced four assets that outlast this one service: the `Java migrator` agent, the saved plan, the playbook, and a test router that now guards the modernized service.
 
 ## Exercise 5: Reuse the assets on the next service
 
-Modernizing the first service was the expensive part. The second one is where building assets pays off: the same agent and the same playbook are most of the work already done — and because the playbook already captured the recipe, you don't need a second research pass to rediscover it. `auth-svc` is the other Java 11 / Spring Boot 2.7 service, and it differs from `audit-svc` in two ways that matter — it issues JWTs with the `jjwt` library, and its `JwtIssuer` is the one place in either service that actually imports `javax.annotation.PostConstruct`, which the Jakarta move renames to `jakarta.annotation.PostConstruct`.
+Modernizing the first service was the expensive part. The second one is where building assets pays off: the same agent and the same playbook are most of the work already done — and because the playbook already captured the recipe, you don't need a second research pass to rediscover it. `auth-svc` starts from the same Java 17 / Spring Boot 3.5 baseline as `audit-svc`, but it carries this module's real dependency-security lesson: it issues JWTs with the `jjwt` library, and under Spring Boot 4 `jjwt`'s serializer drags in a vulnerable transitive Jackson 2 — exactly the dependency the framework upgrade stops managing for you. Clearing it without regressing the clean baseline is the substance of this upgrade: bump `jjwt` from `0.11.5` to `0.12.7` (its `-api`, `-impl`, and `-gson` artifacts) and swap the `jjwt-jackson` serializer for `jjwt-gson`, whose CVE-clean Gson dependency (`2.13.2`) removes Jackson 2 from `auth-svc` entirely.
 
 > [!TIP]
-> Those two differences are here on purpose. `auth-svc` isn't a clean re-run of `audit-svc`, and that's the point. It leans on an extra third-party library for its login tokens, and it uses one of the renamed building blocks that the framework upgrade moves from the old `javax` name to the new `jakarta` one — small, realistic ways that no two services are ever quite alike. When one of those trips a test, you're watching the safety net do its job, not the agent coming apart. A failing test is a precise signal you hand back to the agent — "this library changed," "this name moved" — and it adapts. That loop, where good prep plus a red test sharpens the next instruction, is exactly how better inputs produce better AI outcomes. Expect a little iteration on the second service, and read it as the process working rather than the agent misbehaving.
+> That difference is here on purpose. `auth-svc` isn't a clean re-run of `audit-svc`, and that's the point. It leans on an extra third-party library for its login tokens, and that library's transitive dependencies react to the Spring Boot 4 upgrade in a way `audit-svc`'s never do — small, realistic ways that no two services are ever quite alike. When the vulnerable-Jackson pull trips a build or a dependency check, you're watching the safety net do its job, not the agent coming apart. A red signal is a precise instruction you hand back to the agent — "this library pulled a vulnerable transitive," "swap the serializer to jjwt-gson" — and it adapts. That loop, where good prep plus a red result sharpens the next instruction, is exactly how better inputs produce better AI outcomes. Expect a little iteration on the second service, and read it as the process working rather than the agent misbehaving.
 
 1. Start a new session in Copilot to load the changes we just made by using the `/new` command.
 2. Build the safety net first, the same way you did for `audit-svc`. Have Copilot write the tests and confirm they pass against the current version so you have a baseline before anything changes:
 
     ```text
-    Add safety net tests for auth-svc: a context-load test plus integration tests for the TokenController that assert a token is issued and validates, using an isolated temporary database. Run them with scripts/with-java11 mvn test and confirm they pass on the current version.
+    Add safety net tests for auth-svc: a context-load test plus integration tests for the TokenController that assert a token is issued and validates, using an isolated temporary database. Run them with mvn test and confirm they pass on the current version.
     ```
 
 3. Enable the Java migrator agent by using the `/agent` command in Copilot, selecting `java-migrator`, then selecting <kbd>Enter</kbd>.
@@ -325,8 +325,9 @@ The throughline is that AI changes the cost of each step, not the need for the s
 - [Adding MCP servers for GitHub Copilot CLI][copilot-mcp]
 - [Researching with GitHub Copilot CLI][copilot-research]
 - [Creating custom agents for GitHub Copilot CLI][copilot-agents-create]
-- [Spring Boot 3.0 migration guide][spring-boot-3-migration]
-- [Jakarta EE Platform 9 specification][jakarta-ee-9]
+- [Spring Boot 4.0 migration guide][spring-boot-4-migration]
+- [Spring Framework 7 reference][spring-framework-7]
+- [Jackson 3][jackson-3]
 - [GitHub Copilot modernization plugin][copilot-modernization-plugin]
 
 ---
@@ -346,10 +347,11 @@ The throughline is that AI changes the cost of each step, not the need for the s
 [awesome-copilot]: https://awesome-copilot.github.com/
 [jdtls]: https://github.com/eclipse-jdtls/eclipse.jdt.ls
 [copilot-research]: https://docs.github.com/copilot/concepts/agents/copilot-cli/research
-[jakarta-ee-9]: https://jakarta.ee/specifications/platform/9/
+[jackson-3]: https://github.com/FasterXML/jackson#jackson-30
+[spring-framework-7]: https://docs.spring.io/spring-framework/reference/7.0/index.html
 [spring-data-jpa]: https://spring.io/guides/gs/accessing-data-jpa/
 [copilot-modernization-plugin]: https://github.com/microsoft/github-copilot-modernization
 [copilot-cli-lsp-add]: https://docs.github.com/copilot/how-tos/copilot-cli/set-up-copilot-cli/add-lsp-servers
 [copilot-mcp]: https://docs.github.com/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers
 [copilot-agents-create]: https://docs.github.com/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli
-[spring-boot-3-migration]: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide
+[spring-boot-4-migration]: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide
