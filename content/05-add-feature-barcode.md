@@ -8,7 +8,13 @@ Adding a greenfield feature inside a brownfield app is a real test of an agentic
 The antidote isn't a trick; it's a loop you run every time you work with an agent — research, spec and plan, build, QA, then iterate. This module walks that loop end to end, using QR code support for AssetTrack as the forcing function for `/research`, `/plan` with a rubber-duck critique, `/fleet`, and a quality assurance custom agent you build yourself.
 
 > [!NOTE]
-> **Starting state**: instructions, custom agents (including the `Accessibility Expert` from [Module 2][m02]), and the tests from [Modules 2–3][m02] are in place, and the hooks from [Module 4][m04] are wired up. This module registers the Playwright MCP server and has you build a quality assurance custom agent, then **modifies application code** in `assets-svc` and `web` — so work on a feature branch such as `feat/barcode-support`.
+> **Starting state**: instructions, custom agents (including the `Accessibility Expert` from [Module 2][m02]), and the tests from [Modules 2–3][m02] are in place, and the hooks from [Module 4][m04] are wired up. If you're jumping in here, check out the catch-up branch that holds them:
+>
+> ```bash
+> git checkout start-of-module-05
+> ```
+>
+> This module registers the Playwright MCP server and has you build a quality assurance custom agent, then **modifies application code** in `assets-svc` and `web` — so work on a feature branch such as `feat/barcode-support`.
 
 ## What you will learn
 

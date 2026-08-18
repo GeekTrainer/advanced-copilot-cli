@@ -30,7 +30,7 @@ Every module file follows this section order:
 9. A `---` rule, then the navigation table from step 2 repeated.
 10. All reference link definitions grouped at the bottom in order of first appearance: `previous-lesson`, `next-lesson`, the `mNN` module labels, then doc links.
 
-If a module depends on assets from earlier modules a learner may have skipped, add a catch-up block after the intro: a `> [!NOTE]` starting state plus a `node scripts/catchup.mjs` fenced command (see `content/03`).
+If a module depends on state from earlier modules a learner may have skipped, add a catch-up block after the intro: a `> [!NOTE]` starting state plus a `git checkout start-of-module-N` fenced command that puts the learner on the catch-up branch holding the cumulative output of the earlier modules (see `content/03`). The `start-of-module-N` branches live on the `geektrainer/legacy-app` template; there is no `start-of-module-01`, since Module 1 starts from the pristine fork.
 
 ## Exercise and step conventions
 

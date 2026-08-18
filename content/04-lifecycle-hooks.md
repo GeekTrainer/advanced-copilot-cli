@@ -17,7 +17,11 @@ The AI layer of the agent loop is **probabilistic**. It may or may not remember 
 ## Scenario
 
 > [!NOTE]
-> **Starting state**: the AI infrastructure - instructions, custom agents, skills from [Module 2][m02], and the Playwright test scaffold from [Module 3][previous-lesson] are in place on your fork.
+> **Starting state**: the AI infrastructure - instructions, custom agents, skills from [Module 2][m02], and the Playwright test scaffold from [Module 3][previous-lesson] are in place on your fork. If you're jumping in here, check out the catch-up branch that holds them:
+>
+> ```bash
+> git checkout start-of-module-04
+> ```
 
 At the end of [Module 3][previous-lesson] you delegated the test backfill to the Copilot cloud agent. Those tests now exist, but they run only when you explicitly ask, or when CI picks them up on a push. There is nothing that automatically runs the right checks right after the agent edits a file, while it still has context on what it just changed. Hooks close that gap.
 

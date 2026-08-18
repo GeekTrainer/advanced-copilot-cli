@@ -62,19 +62,31 @@ Each module is a single markdown file under [`content/`](./content/). Modules bu
 
 Head to [Module 0: Environment setup][m00] to get your environment ready.
 
-## Module 3 catch-up assets
+## Jumping into a module: catch-up branches
 
-If you jump directly into Module 3, run the catch-up script from the AssetTrack repository root:
+Each module assumes the cumulative output of every earlier module. If you skip ahead, check out the matching catch-up branch on your AssetTrack repository before you start. Each `start-of-module-N` branch holds the state a learner has after finishing every module before `N`, so `start-of-module-03` gives you everything the first two modules produce.
+
+Create your AssetTrack repository from the [`geektrainer/legacy-app`][legacy-app] template with **Include all branches** selected so the catch-up branches come along, then check out the branch for the module you're starting (Module 3 shown):
 
 ```bash
-node scripts/catchup.mjs --source-repo-url https://github.com/GeekTrainer/advanced-copilot-cli --asset-path assets/03
+git checkout start-of-module-03
 ```
 
-```powershell
-node scripts/catchup.mjs --source-repo-url https://github.com/GeekTrainer/advanced-copilot-cli --asset-path assets/03
-```
+| Starting module | Check out | What it gives you |
+|---|---|---|
+| [Working with Copilot CLI][m01] | *(default branch)* | pristine AssetTrack fork |
+| [Building an AI infrastructure foundation][m02] | `start-of-module-02` | Module 1 documentation updates |
+| [Enhancing the test suite with remote and delegation][m03] | `start-of-module-03` | the above plus the AI infrastructure (instructions, custom agents, `make-repo-contribution` skill) |
+| [Shaping Copilot CLI's lifecycle with hooks][m04] | `start-of-module-04` | the above plus the Playwright test foundation |
+| [Adding a new feature: barcode support][m05] | `start-of-module-05` | the above plus the lifecycle hooks |
+| [Modernizing apps with Copilot CLI][m06] | `start-of-module-06` | the above plus the barcode feature and QA agent |
+| [Managing Copilot's infrastructure][m07] | `start-of-module-07` | the above plus the modernized services |
 
-The script pulls from the [course source repository][course-source-repo] and copies the selected asset path into the AssetTrack repository root, excluding the `scripts/` directories. To test against a local checkout before the assets are merged upstream, pass `--source-path`. To reuse it for another module, pass that module's asset path, such as `--asset-path assets/04`.
+Module 1 starts from the pristine fork, so it has no catch-up branch, and there is no branch after Module 7 because that module's work targets your fork only. Older forks and content may still carry the deprecated `02-building-ai-infra-solution` and `03-test-suite-remote-delegation-solution` branches; these are kept as frozen aliases of `start-of-module-03` and `start-of-module-04` and still resolve.
+
+### Keeping the catch-up branches current
+
+The `start-of-module-N` branches live on `GeekTrainer/legacy-app`, which owns their generation, validation, and promotion. `legacy-app` regenerates them by pulling this repository's public content on a schedule and on demand through a manual `workflow_dispatch`, then opens a pull request that a human reviews and approves before the branches move. This repository stays pure content — it publishes module updates and holds no automation that reaches into `legacy-app`.
 
 ## Status
 
@@ -90,4 +102,3 @@ This repository contains the **skeleton** for the course. Each module file captu
 [m06]: ./content/06-modernize-apps.md
 [m07]: ./content/07-manage-infrastructure.md
 [m08]: ./content/08-wrap-up.md
-[course-source-repo]: https://github.com/GeekTrainer/advanced-copilot-cli

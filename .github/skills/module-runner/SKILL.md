@@ -1,8 +1,8 @@
 ---
 name: module-runner
 description: |
-  Simulate a learner running an advanced-copilot-cli course module end-to-end. Read a module from content/NN-*.md, execute every learner step in order on the machine where the skill runs, run every command and prompt individually, verify outcomes, and write findings to issues/NN-issues.md. Can also build or refresh a module's official solution branch by driving a real Copilot CLI instance with the module's own prompts.
-  USE FOR: run a module, test a module, validate a course module, simulate a student, learner walkthrough, find module issues, run module steps, build a solution branch, refresh a solution branch by driving Copilot CLI.
+  Simulate a learner running an advanced-copilot-cli course module end-to-end. Read a module from content/NN-*.md, execute every learner step in order on the machine where the skill runs, run every command and prompt individually, verify outcomes, and write findings to issues/NN-issues.md. Can also build or refresh a module's official solution branch by driving a real Copilot CLI instance with the module's own prompts. Can also run non-interactively as a deterministic validator/seed engine invoked by an external branch generator to regenerate and verify per-module state.
+  USE FOR: run a module, test a module, validate a course module, simulate a student, learner walkthrough, find module issues, run module steps, build a solution branch, refresh a solution branch by driving Copilot CLI, validate or seed a start-of-module-N branch, run as a non-interactive validator invoked by CI or an external generator.
   DO NOT USE FOR: editing course content without running it, generic code review, running Azure agentic journeys, or static-only content review.
 ---
 
@@ -66,24 +66,26 @@ If the module names a target learner repository, such as the Module 3 instructio
 
 ### Solution-branch catch-up setup
 
-A jump-in learner catches up by starting from the previous module's solution branch on the template repository, not by running an asset script. Read the module's catch-up instructions to find the branch name. For example, Module 3 has the learner start from the Module 2 solution branch `02-building-ai-infra-solution`, which contains the Module 2 AI infrastructure a fresh AssetTrack repository would otherwise be missing.
+A jump-in learner catches up by checking out the `start-of-module-N` catch-up branch on the `GeekTrainer/legacy-app` template repository, not by running an asset script. `start-of-module-N` holds the cumulative end state of every module before `N` (so `start-of-module-03` is the state a learner has after finishing Module 2). The template hosts `start-of-module-02` through `start-of-module-07`; there is no `start-of-module-01`, because Module 1 starts from the pristine fork's default branch. Read the module's catch-up instructions to confirm the exact branch name.
 
-When a module depends on a solution branch for a valid test run, get onto that branch after the learner repository is cloned or copied and before dependency install, devcontainer setup, Copilot prompts, app startup, commits, pushes, or delegation.
+The older `NN-<slug>-solution` branch names are kept as frozen deprecated aliases and still resolve: `02-building-ai-infra-solution` aliases `start-of-module-03`, and `03-test-suite-remote-delegation-solution` aliases `start-of-module-04`. Prefer the `start-of-module-N` name; treat an alias in older content as equivalent.
 
-If you create the learner repository from the template with `gh repo create --template`, pass `--include-all-branches` so the solution branches come along, then check out the branch:
+When a module depends on a catch-up branch for a valid test run, get onto that branch after the learner repository is cloned or copied and before dependency install, devcontainer setup, Copilot prompts, app startup, commits, pushes, or delegation.
 
-```bash
-git -C learner-workspace/<repo> checkout 02-building-ai-infra-solution
-```
-
-If the solution branch is not present in the learner repository, fetch it from the template repository into a local branch first:
+If you create the learner repository from the template with `gh repo create --template`, pass `--include-all-branches` so the catch-up branches come along, then check out the branch for the target module (Module 3 shown):
 
 ```bash
-git -C learner-workspace/<repo> fetch https://github.com/GeekTrainer/legacy-app 02-building-ai-infra-solution:02-building-ai-infra-solution
-git -C learner-workspace/<repo> checkout 02-building-ai-infra-solution
+git -C learner-workspace/<repo> checkout start-of-module-03
 ```
 
-Record the solution branch, commands, and output in `logs/commands.md` and `logs/transcript.md`. If the required solution branch is unavailable, record a missing-prerequisite blocker and stop before the first dependent learner step.
+If the catch-up branch is not present in the learner repository, fetch it from the template repository into a local branch first:
+
+```bash
+git -C learner-workspace/<repo> fetch https://github.com/GeekTrainer/legacy-app start-of-module-03:start-of-module-03
+git -C learner-workspace/<repo> checkout start-of-module-03
+```
+
+Record the catch-up branch, commands, and output in `logs/commands.md` and `logs/transcript.md`. If the required branch is unavailable, record a missing-prerequisite blocker and stop before the first dependent learner step.
 
 ### GitHub template repository setup
 
@@ -182,11 +184,11 @@ For commits, pushes, cloud delegation, Azure deployment, paid resources, or othe
 
 ## Solution-branch mode: build a module's solution by driving Copilot CLI
 
-Use this mode when the user asks to build or refresh a module's official solution branch (for example `NN-<slug>-solution`) rather than only to find issues. The rule that makes this mode "real": do not hand-author the solution artifacts yourself. Drive a genuine Copilot CLI instance with the module's own prompts so the solution is actually Copilot-generated, then commit it. This mode reuses the devcontainer-first execution and solution-branch catch-up rules above, and still logs content problems to the issue report.
+Use this mode when the user asks to build or refresh a module's produced state — the catch-up branch `start-of-module-(N+1)` that captures the end state of Module `N` (for example, running Module 2 produces `start-of-module-03`) — rather than only to find issues. The rule that makes this mode "real": do not hand-author the solution artifacts yourself. Drive a genuine Copilot CLI instance with the module's own prompts so the solution is actually Copilot-generated, then commit it. This mode reuses the devcontainer-first execution and catch-up-branch rules above, and still logs content problems to the issue report. For a fully automated, non-interactive run driven by an external generator, use the validator/seed mode described below instead.
 
 ### Set up the branch and environment
 
-1. Clone the learner template repository, check out the previous module's solution branch, then create the new solution branch off it: `git checkout -b NN-<slug>-solution`.
+1. Clone the learner template repository, check out the module's catch-up branch `start-of-module-NN` (zero-padded two-digit, for example `start-of-module-04`; the `NN-<slug>-solution` aliases still resolve), then create the produced-state branch off it — the next module's zero-padded catch-up branch: `git checkout -b start-of-module-NN` (for example, running Module 4 produces `start-of-module-05`).
 2. Bring up the project devcontainer (`devcontainer up --workspace-folder <learner-root>`) and verify the toolchains inside it. Run every command and every Copilot prompt through `devcontainer exec`. Never build, test, or generate on the bare host — the polyglot stacks (Java, .NET, Python, Node, Maven, Playwright) usually only exist inside the container.
 
 ### Authenticate the nested Copilot CLI
@@ -224,6 +226,112 @@ These behaviors showed up when building the Module 3 solution branch and are wor
 - Backend test isolation via a process-global environment variable (for example `ASSETS_DB_PATH`) can race under parallel test runners. Watch for intermittent failures and disable parallelization if needed.
 - Inline `httpx.AsyncClient` context managers are hard for the agent to mock, and it may drop required tests. Hint the synchronous `TestClient` plus monkeypatched `httpx.AsyncClient` approach, or factor the calls into helpers.
 - Log every module-content problem found this way to `issues/<module-number>-issues.md` (or the file the user names), the same as learner mode.
+
+## Validator/seed mode: non-interactive invocation by an external generator
+
+Use this mode when an external branch generator — the `GeekTrainer/legacy-app` maintenance workflow — invokes module-runner in CI to regenerate and verify a module's produced state without a human in the loop. It is the same real execution as solution-branch mode (drive Copilot with the module's own prompts, verify against the module's own checks), but it runs unattended, confines all writes to declared paths, and emits a stable, machine-checkable result so the caller can gate on it.
+
+This mode is the deterministic seed engine the legacy-app generator calls. The generated code may vary run to run because the model is probabilistic; determinism here means the **contract** is stable — fixed inputs, fixed output locations, a fixed result schema, stable commit messages, and a pass/fail decision derived from the module's own verification steps rather than from Copilot's self-report.
+
+### Invocation contract (inputs)
+
+The caller starts a single non-interactive Copilot CLI session on the runner and asks for module-runner in validator/seed mode. Recommended entrypoint:
+
+```bash
+copilot -p "Run module-runner in validator/seed mode with: mode=<validate|seed> module=<N> base-ref=<git-ref> acc-ref=<sha> repo=<path> out=<dir>" \
+  --model <model> --allow-all --log-level error
+```
+
+The skill reads these named inputs from the invocation:
+
+| Input | Meaning |
+|---|---|
+| `mode` | `validate` runs and verifies without emitting a patch series; `seed` runs, verifies, and emits the produced-state delta for promotion. |
+| `module` | Module number `1..7` whose content is executed. |
+| `base-ref` | Git ref in the learner repo to start from, passed verbatim by the caller: the zero-padded two-digit branch `start-of-module-NN` for `module >= 2` (for example `start-of-module-04`, never `start-of-module-4`), or the pristine default branch / `acc-base` tag for `module == 1`. Consume this value as given; never reconstruct the branch name from an unpadded `module` number. |
+| `acc-ref` | The `advanced-copilot-cli` commit SHA (or ref) to read the module content from. Checked out into the course root before the run. |
+| `repo` | Path to the learner repo checkout (`legacy-app`) where learner steps execute. All learner writes stay inside this path. |
+| `out` | Output directory for evidence, patches, and the result file. All review artifacts stay inside this path. |
+| `model` | Optional model override; pin it when the caller wants reproducible generation attempts. |
+
+The run must not write outside `repo` and `out` (plus `issues/` in the course root). It must not push, open PRs, or delegate; producing the delta is the generator's job to promote downstream.
+
+### Determinism rules
+
+1. Read the module from `acc-ref` exactly; never from working-tree edits.
+2. Start from `base-ref` on a clean checkout; abort with a `BLOCKED` result if the base ref is missing or the tree is dirty.
+3. Use stable, parameterized commit messages with no timestamps or volatile data:
+
+   ```text
+   chore(seed): module <N> produced-state for start-of-module-NN [acc:<acc-ref-short>]
+   ```
+
+   The `start-of-module-NN` branch name is zero-padded two-digit (Module 4 produces `start-of-module-05`).
+
+   Keep the `Co-authored-by: Copilot` trailer, because Copilot authored the artifacts.
+4. Emit patches with `git format-patch` in commit order so the series is reproducible and reviewable.
+5. Derive the pass/fail decision only from the module's own verification steps (tests, required file paths, required commands) — never from Copilot's success summary.
+6. Run fully non-interactively (`--allow-all`); if any step would need interactive input, credentials, or an unavailable external service, stop and record a `BLOCKED` result instead of guessing.
+7. Confine writes to `repo` and `out`; leave the course root unchanged except for `issues/<NN>-issues.md`.
+
+### Output contract
+
+Write everything under `out`:
+
+```text
+<out>/
+├── result.json          # machine-checkable summary (schema below)
+├── patches/             # git format-patch series (seed mode only)
+├── evidence/            # command logs, test output, tool results
+└── issues/<NN>-issues.md
+```
+
+`result.json` is the machine-readable summary the caller gates on. Write it as the final action of every run, including failures:
+
+```json
+{
+  "schema_version": 1,
+  "mode": "seed",
+  "module": 2,
+  "base_ref": "start-of-module-02",
+  "acc_ref": "<full-40-char-acc-sha>",
+  "produced_branch": "start-of-module-03",
+  "result": "PASS",
+  "patches": ["patches/0001-....patch"],
+  "verification": [
+    { "name": "playwright a11y suite", "command": "npm run test:e2e", "status": "pass" }
+  ],
+  "issues_report": "issues/02-issues.md",
+  "started_at": "<ISO-8601>",
+  "finished_at": "<ISO-8601>"
+}
+```
+
+`result` is one of `PASS` (produced state generated and every verification step passed), `FAIL` (a verification step failed), or `BLOCKED` (a prerequisite, credential, or external service prevented a valid run). In `validate` mode omit `patches` and `produced_branch`.
+
+### Result and exit-code semantics
+
+Because the skill runs inside a Copilot CLI session, `result.json` — not the process exit code of `copilot` — is the authoritative signal. The caller reads `result.json` and maps it to an exit code for its pipeline:
+
+| `result.json` state | Recommended caller exit code |
+|---|---|
+| `result: "PASS"` | `0` |
+| `result: "FAIL"` | `1` |
+| `result: "BLOCKED"` | `2` |
+| missing or unparseable `result.json` | `3` |
+
+A minimal wrapper the generator can run in CI:
+
+```bash
+copilot -p "Run module-runner in validator/seed mode with: mode=seed module=$MODULE base-ref=$BASE_REF acc-ref=$ACC_SHA repo=$REPO out=$OUT" \
+  --model "$MODEL" --allow-all --log-level error
+node -e 'const r=require(process.env.OUT+"/result.json");process.exit(r.result==="PASS"?0:r.result==="FAIL"?1:2)' \
+  || { [ -f "$OUT/result.json" ] || exit 3; }
+```
+
+### Evidence
+
+Evidence requirements match learner and solution-branch modes: capture each command, prompt, exit status, and a short output excerpt under `evidence/`, and log every module-content problem to `issues/<NN>-issues.md`. The generator promotes the patch series and inspects `result.json` and the evidence; module-runner never promotes, pushes, or opens PRs itself.
 
 ## Issue reporting
 
@@ -302,4 +410,8 @@ Use module-runner to simulate a learner through Module 3 and write issues to iss
 
 ```text
 Use module-runner in solution-branch mode: build the Module 3 solution branch by driving Copilot CLI through the exercises, and log any content issues to 03-issues.md.
+```
+
+```text
+Run module-runner in validator/seed mode with: mode=seed module=2 base-ref=start-of-module-02 acc-ref=<acc-sha> repo=./legacy-app out=./out/module-02. Emit the produced-state patch series for start-of-module-03 and write result.json.
 ```
