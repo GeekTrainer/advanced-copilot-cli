@@ -1,6 +1,6 @@
 # Advanced Copilot CLI — Internal Outline
 
-> **Source:** [Advanced Copilot CLI.docx](https://microsoft-my.sharepoint.com/personal/chrhar_microsoft_com/_layouts/15/Doc.aspx?sourcedoc=%7BACCD6482-1C0B-4145-B08C-CD38A5AD9DE3%7D&file=Advanced%20Copilot%20CLI.docx) by Christopher Harrison
+> **Source:** Advanced Copilot CLI (internal design doc) by Christopher Harrison
 >
 > Extracted via WorkIQ on 2026-05-18. This is a verbatim snapshot of the doc's outline at that point in time — scenarios, tech topics, and exercises. Use this as the canonical reference when aligning repo content with the course outline. The source doc is authoritative; refresh this file when the doc changes.
 >
