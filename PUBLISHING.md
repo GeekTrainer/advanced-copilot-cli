@@ -2,6 +2,21 @@
 
 This document describes a potential plan for landing the **advanced-copilot-cli** course inside the [`awesome-copilot`](https://github.com/github/awesome-copilot) Learning Hub with a modular approach to allow for exercises to use different languages and scenarios. Authoring continues to live in this repo; the awesome-copilot side is downstream.
 
+## Current implementation (2026-08) — supersedes the historical plan below
+
+The publishing mechanism now mirrors the established [`github-samples/copilot-workshops`][workshops-sync] precedent rather than the standalone downstream sync script sketched later in this document. The staged implementation lives in [`publishing/`](./publishing/):
+
+- **Mechanism:** a [GitHub Agentic Workflow][gh-aw] (`publishing/advanced-copilot-cli-sync.md`) written exactly as it will live at `.github/workflows/advanced-copilot-cli-sync.md` in `awesome-copilot`, a third sibling to `cli-for-beginners-sync.md` and `copilot-workshops-sync.md`. It runs read-only, pulls from the public sample `github-samples/advanced-copilot-cli`, and opens a **same-repo** PR via gh-aw `safe-outputs.create-pull-request` on the built-in `GITHUB_TOKEN` — no fork, no PAT, no long-lived cross-repo secret, human-reviewed.
+- **Layout:** the nine modules nest under a single `multi-stack` track (`learning-hub/advanced-copilot-cli/multi-stack/NN-slug.md`), matching how the Copilot Workshops course nests a track under its course folder. The course landing is a "choose your track" page, leaving room for the `.NET` and `Next.js` tracks below.
+- **Transform preview:** `scripts/awesome-copilot-dry-run.mjs` deterministically renders the transformed tree into `publishing/preview/` offline, so the mapping can be reviewed before anything goes live.
+- **Safety:** the workflow ships with `safe-outputs.staged: true`, so a real run opens no PR (the intended PR is emitted as an artifact). It stays inert with respect to `awesome-copilot` until the flag is removed. The flip-to-live checklist is in `publishing/README.md`.
+
+> [!IMPORTANT]
+> Two assumptions in the historical plan below are now **stale**. (1) awesome-copilot renders GitHub admonitions natively via a remark plugin, so admonitions are **preserved verbatim**, not converted to Starlight `:::` asides. (2) The `.NET` and `Next.js` tracks remain unwritten; the current work ships the `multi-stack` track only. The sections below are retained for historical context.
+
+[workshops-sync]: https://github.com/github/awesome-copilot/blob/main/.github/workflows/copilot-workshops-sync.md
+[gh-aw]: https://github.github.com/gh-aw
+
 ## Goal
 
 Land the course at `/learning-hub/advanced-copilot-cli/` on the Learning Hub site as **three tracks** the learner picks once and stays in:
